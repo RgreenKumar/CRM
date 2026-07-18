@@ -14,13 +14,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/h2-console/**", "/", "/index.html", "/static/**", "/assets/**", "/*.js", "/*.css", "/vite.svg").permitAll()
-                .anyRequest().permitAll() // Allow all for now, to ensure frontend routing works without auth blocking
-            )
-            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())); // For H2 console
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**", "/h2-console/**", "/", "/index.html", "/static/**",
+                                "/assets/**", "/*.js", "/*.css", "/vite.svg")
+                        .permitAll()
+                        .anyRequest().permitAll() // Allow all for now, to ensure frontend routing works without auth
+                                                  // blocking
+                )
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())); // For H2 console
 
         return http.build();
     }
 }
+
+// hello this is my new comment
