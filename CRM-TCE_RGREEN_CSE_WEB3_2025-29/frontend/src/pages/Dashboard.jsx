@@ -110,10 +110,24 @@ const DashboardOverview = () => {
 };
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // --- MOCK DATA (works without backend) ---
+  const MOCK_MODE = true; // set false when Spring Boot is running
+
+  const MOCK_USERS_INIT = [
+    { id: 1, fullName: 'Alice Johnson', email: 'alice@example.com', role: 'Admin', status: 'Active' },
+    { id: 2, fullName: 'Bob Smith', email: 'bob@example.com', role: 'Sales User', status: 'Active' },
+    { id: 3, fullName: 'Charlie Brown', email: 'charlie@example.com', role: 'Manager', status: 'Inactive' },
+    { id: 4, fullName: 'Diana Prince', email: 'diana@example.com', role: 'Sales User', status: 'Active' },
+    { id: 5, fullName: 'Ethan Hunt', email: 'ethan@example.com', role: 'Support', status: 'Active' },
+    { id: 6, fullName: 'Fiona Green', email: 'fiona@example.com', role: 'Sales User', status: 'Inactive' },
+  ];
+  // --- END MOCK DATA ---
+
+  const [users, setUsers] = useState(MOCK_MODE ? MOCK_USERS_INIT : []);
+  const [loading, setLoading] = useState(!MOCK_MODE);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [nextId, setNextId] = useState(7);
 
   // Modals state
   const [showAddModal, setShowAddModal] = useState(false);
@@ -131,6 +145,7 @@ const UserManagement = () => {
   const [formError, setFormError] = useState('');
 
   const fetchUsers = async () => {
+    if (MOCK_MODE) return; // skip — using in-memory data
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
@@ -151,7 +166,7 @@ const UserManagement = () => {
   };
 
   useEffect(() => {
-    fetchUsers();
+    if (!MOCK_MODE) fetchUsers();
   }, []);
 
   const openAddModal = () => {
@@ -182,12 +197,14 @@ const UserManagement = () => {
     e.preventDefault();
     setFormError('');
 
-    if (!fullName.trim()) {
-      setFormError('Full Name is required');
-      return;
-    }
-    if (!email.trim()) {
-      setFormError('Email is required');
+    if (!fullName.trim()) { setFormError('Full Name is required'); return; }
+    if (!email.trim()) { setFormError('Email is required'); return; }
+
+    if (MOCK_MODE) {
+      const newUser = { id: nextId, fullName, email, role, status };
+      setUsers(prev => [...prev, newUser]);
+      setNextId(n => n + 1);
+      setShowAddModal(false);
       return;
     }
 
@@ -195,35 +212,24 @@ const UserManagement = () => {
       const token = localStorage.getItem('token');
       const res = await fetch('/api/users', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ name: fullName, email, role, status })
       });
-      
-      if (res.ok) {
-        setShowAddModal(false);
-        fetchUsers();
-      } else {
-        const data = await res.json();
-        setFormError(data.message || 'Failed to add user');
-      }
-    } catch (err) {
-      setFormError('Network error. Please try again.');
-    }
+      if (res.ok) { setShowAddModal(false); fetchUsers(); }
+      else { const data = await res.json(); setFormError(data.message || 'Failed to add user'); }
+    } catch (err) { setFormError('Network error. Please try again.'); }
   };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     setFormError('');
 
-    if (!fullName.trim()) {
-      setFormError('Full Name is required');
-      return;
-    }
-    if (!email.trim()) {
-      setFormError('Email is required');
+    if (!fullName.trim()) { setFormError('Full Name is required'); return; }
+    if (!email.trim()) { setFormError('Email is required'); return; }
+
+    if (MOCK_MODE) {
+      setUsers(prev => prev.map(u => u.id === selectedUser.id ? { ...u, fullName, email, role, status } : u));
+      setShowEditModal(false);
       return;
     }
 
@@ -231,44 +237,30 @@ const UserManagement = () => {
       const token = localStorage.getItem('token');
       const res = await fetch(`/api/users/${selectedUser.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ name: fullName, email, role, status })
       });
-
-      if (res.ok) {
-        setShowEditModal(false);
-        fetchUsers();
-      } else {
-        const data = await res.json();
-        setFormError(data.message || 'Failed to update user');
-      }
-    } catch (err) {
-      setFormError('Network error. Please try again.');
-    }
+      if (res.ok) { setShowEditModal(false); fetchUsers(); }
+      else { const data = await res.json(); setFormError(data.message || 'Failed to update user'); }
+    } catch (err) { setFormError('Network error. Please try again.'); }
   };
 
   const handleDeleteConfirm = async () => {
+    if (MOCK_MODE) {
+      setUsers(prev => prev.filter(u => u.id !== selectedUser.id));
+      setShowDeleteModal(false);
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`/api/users/${selectedUser.id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-      
-      if (res.ok) {
-        setShowDeleteModal(false);
-        fetchUsers();
-      } else {
-        alert('Failed to delete user.');
-      }
-    } catch (err) {
-      alert('Network error. Failed to delete user.');
-    }
+      if (res.ok) { setShowDeleteModal(false); fetchUsers(); }
+      else { alert('Failed to delete user.'); }
+    } catch (err) { alert('Network error. Failed to delete user.'); }
   };
 
   // Filter users based on search term

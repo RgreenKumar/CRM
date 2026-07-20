@@ -61,6 +61,29 @@ export const LoginPage = () => {
     
     if (!isValid) return; // Show inline errors
 
+    // --- MOCK LOGIN (works without backend) ---
+    // Any email + password = "password" will log you in for demo/testing
+    const MOCK_MODE = true; // set to false when Spring Boot backend is running
+    if (MOCK_MODE) {
+      if (password === 'password') {
+        const mockToken = 'mock-jwt-token-12345';
+        const mockUser = {
+          id: 1,
+          name: email.split('@')[0].replace(/[._]/g, ' '),
+          email: email,
+          role: 'Admin',
+        };
+        localStorage.setItem('token', mockToken);
+        localStorage.setItem('user', JSON.stringify(mockUser));
+        navigate('/dashboard');
+        return;
+      } else {
+        setBannerError('Demo mode: use password "password" to log in');
+        return;
+      }
+    }
+    // --- END MOCK LOGIN ---
+
     try {
       // [ Submit API Request (POST /login) ]
       const response = await fetch('/api/auth/login', {
