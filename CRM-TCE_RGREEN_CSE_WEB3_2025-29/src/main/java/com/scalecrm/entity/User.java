@@ -24,12 +24,27 @@ public class User {
     @Column
     private java.time.LocalDateTime otpExpiry;
 
+    @Column(name = "full_name")
+    private String fullName;
+
+    @Column(nullable = false)
+    private String status = "Active"; // e.g. Active, Inactive
+
     public User() {}
     
     public User(String email, String password, String role) {
         this.email = email;
         this.password = password;
         this.role = role;
+        this.status = "Active";
+    }
+
+    public User(String email, String password, String role, String fullName, String status) {
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.fullName = fullName;
+        this.status = status;
     }
 
     public Long getId() { return id; }
@@ -43,6 +58,12 @@ public class User {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     public String getOtp() { return otp; }
     public void setOtp(String otp) { this.otp = otp; }

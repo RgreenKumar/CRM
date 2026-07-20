@@ -78,7 +78,7 @@ export const LoginPage = () => {
         
         // [ Fetch User Profile / Permissions ]
         try {
-          const profileRes = await fetch('/api/user/profile', {
+          const profileRes = await fetch('/api/auth/profile', {
             headers: { 'Authorization': `Bearer ${data.token}` }
           });
           if (profileRes.ok) {

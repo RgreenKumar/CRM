@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 
 const DashboardOverview = () => {
@@ -109,12 +109,385 @@ const DashboardOverview = () => {
   );
 };
 
-const UserManagement = () => (
-  <div>
-    <h2 className="page-title">User Management</h2>
-    <div className="card">Manage your platform users here.</div>
-  </div>
-);
+const UserManagement = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Modals state
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  
+  // Selected user for edit/delete
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  // Form states
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [role, setRole] = useState('Sales User');
+  const [status, setStatus] = useState('Active');
+  const [formError, setFormError] = useState('');
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/users', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data);
+      } else {
+        setError('Failed to fetch users.');
+      }
+    } catch (err) {
+      setError('Network error. Failed to load users.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const openAddModal = () => {
+    setFullName('');
+    setEmail('');
+    setRole('Sales User');
+    setStatus('Active');
+    setFormError('');
+    setShowAddModal(true);
+  };
+
+  const openEditModal = (user) => {
+    setSelectedUser(user);
+    setFullName(user.fullName || '');
+    setEmail(user.email || '');
+    setRole(user.role || 'Sales User');
+    setStatus(user.status || 'Active');
+    setFormError('');
+    setShowEditModal(true);
+  };
+
+  const openDeleteModal = (user) => {
+    setSelectedUser(user);
+    setShowDeleteModal(true);
+  };
+
+  const handleAddSubmit = async (e) => {
+    e.preventDefault();
+    setFormError('');
+
+    if (!fullName.trim()) {
+      setFormError('Full Name is required');
+      return;
+    }
+    if (!email.trim()) {
+      setFormError('Email is required');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name: fullName, email, role, status })
+      });
+      
+      if (res.ok) {
+        setShowAddModal(false);
+        fetchUsers();
+      } else {
+        const data = await res.json();
+        setFormError(data.message || 'Failed to add user');
+      }
+    } catch (err) {
+      setFormError('Network error. Please try again.');
+    }
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setFormError('');
+
+    if (!fullName.trim()) {
+      setFormError('Full Name is required');
+      return;
+    }
+    if (!email.trim()) {
+      setFormError('Email is required');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`/api/users/${selectedUser.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name: fullName, email, role, status })
+      });
+
+      if (res.ok) {
+        setShowEditModal(false);
+        fetchUsers();
+      } else {
+        const data = await res.json();
+        setFormError(data.message || 'Failed to update user');
+      }
+    } catch (err) {
+      setFormError('Network error. Please try again.');
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`/api/users/${selectedUser.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (res.ok) {
+        setShowDeleteModal(false);
+        fetchUsers();
+      } else {
+        alert('Failed to delete user.');
+      }
+    } catch (err) {
+      alert('Network error. Failed to delete user.');
+    }
+  };
+
+  // Filter users based on search term
+  const filteredUsers = users.filter(user => {
+    const term = searchTerm.toLowerCase();
+    const nameMatch = (user.fullName || '').toLowerCase().includes(term);
+    const emailMatch = (user.email || '').toLowerCase().includes(term);
+    const roleMatch = (user.role || '').toLowerCase().includes(term);
+    return nameMatch || emailMatch || roleMatch;
+  });
+
+  return (
+    <div className="user-management-page">
+      <div className="card user-mgmt-card">
+        <div className="user-mgmt-header">
+          <div className="header-info">
+            <h3 className="users-title">Users</h3>
+            <p className="users-subtitle">Manage user accounts and access</p>
+          </div>
+          <div className="header-actions">
+            <div className="search-wrapper">
+              <input 
+                type="text" 
+                placeholder="Search..." 
+                className="search-input"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <button className="btn-add-user" onClick={openAddModal}>
+              <span className="plus-icon">+</span> Add User
+            </button>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="user-mgmt-loading">Loading users...</div>
+        ) : error ? (
+          <div className="user-mgmt-error">{error}</div>
+        ) : (
+          <div className="table-responsive">
+            <table className="user-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="empty-table-row">No users found.</td>
+                  </tr>
+                ) : (
+                  filteredUsers.map((user) => (
+                    <tr key={user.id}>
+                      <td className="user-name-cell">{user.fullName || user.email.split('@')[0]}</td>
+                      <td className="user-email-cell">{user.email}</td>
+                      <td className="user-role-cell">{user.role}</td>
+                      <td>
+                        <span className={`status-pill ${user.status?.toLowerCase() === 'active' ? 'active' : 'inactive'}`}>
+                          {user.status || 'Active'}
+                        </span>
+                      </td>
+                      <td className="user-actions-cell">
+                        <button className="btn-edit-action" onClick={() => openEditModal(user)}>Edit</button>
+                        <button className="btn-delete-action" onClick={() => openDeleteModal(user)}>Delete</button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Add User Modal */}
+      {showAddModal && (
+        <div className="modal-backdrop">
+          <div className="modal-card">
+            <div className="modal-header">
+              <h3>Add User</h3>
+              <button className="modal-close-btn" onClick={() => setShowAddModal(false)}>&times;</button>
+            </div>
+            {formError && <div className="modal-error-banner">{formError}</div>}
+            <form onSubmit={handleAddSubmit}>
+              <div className="modal-body">
+                <div className="modal-form-group">
+                  <label>Full Name *</label>
+                  <input 
+                    type="text" 
+                    placeholder="John Doe" 
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="modal-form-group">
+                  <label>Email *</label>
+                  <input 
+                    type="email" 
+                    placeholder="john.doe@example.com" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="modal-form-group">
+                  <label>Role *</label>
+                  <select value={role} onChange={(e) => setRole(e.target.value)}>
+                    <option value="Admin">Admin</option>
+                    <option value="Sales Manager">Sales Manager</option>
+                    <option value="Sales User">Sales User</option>
+                  </select>
+                </div>
+                <div className="modal-form-group">
+                  <label>Status *</label>
+                  <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn-cancel" onClick={() => setShowAddModal(false)}>Cancel</button>
+                <button type="submit" className="btn-save">Save</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {showEditModal && (
+        <div className="modal-backdrop">
+          <div className="modal-card">
+            <div className="modal-header">
+              <h3>Edit User</h3>
+              <button className="modal-close-btn" onClick={() => setShowEditModal(false)}>&times;</button>
+            </div>
+            {formError && <div className="modal-error-banner">{formError}</div>}
+            <form onSubmit={handleEditSubmit}>
+              <div className="modal-body">
+                <div className="modal-form-group">
+                  <label>Full Name *</label>
+                  <input 
+                    type="text" 
+                    placeholder="John Doe" 
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="modal-form-group">
+                  <label>Email *</label>
+                  <input 
+                    type="email" 
+                    placeholder="john.doe@example.com" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="modal-form-group">
+                  <label>Role *</label>
+                  <select value={role} onChange={(e) => setRole(e.target.value)}>
+                    <option value="Admin">Admin</option>
+                    <option value="Sales Manager">Sales Manager</option>
+                    <option value="Sales User">Sales User</option>
+                  </select>
+                </div>
+                <div className="modal-form-group">
+                  <label>Status *</label>
+                  <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn-cancel" onClick={() => setShowEditModal(false)}>Cancel</button>
+                <button type="submit" className="btn-save">Update</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="modal-backdrop">
+          <div className="modal-card delete-modal-card">
+            <div className="delete-modal-body">
+              <div className="delete-warning-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 9V14" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M12 18.01H12.01" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0V3.86Z" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <div className="delete-text-content">
+                <h3>Delete User</h3>
+                <p>Are you sure you want to delete ? This action cannot be undone.</p>
+              </div>
+            </div>
+            <div className="modal-footer delete-modal-footer">
+              <button className="btn-cancel" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+              <button className="btn-delete" onClick={handleDeleteConfirm}>Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const RolesPermissions = () => (
   <div>
@@ -168,8 +541,22 @@ const AppSettings = () => (
 const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        setCurrentUser(JSON.parse(userStr));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, []);
 
   const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     navigate('/login');
   };
 
@@ -224,10 +611,16 @@ const Dashboard = () => {
         <header className="topbar">
           <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-primary)' }}>{currentNavItem.label}</h2>
           <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
-             <div style={{width: 36, height: 36, borderRadius: '50%', background: '#3b82f6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600'}}>A</div>
+             <div style={{width: 36, height: 36, borderRadius: '50%', background: '#3b82f6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', textTransform: 'uppercase'}}>
+               {currentUser ? (currentUser.fullName ? currentUser.fullName.charAt(0) : currentUser.email.charAt(0)) : 'A'}
+             </div>
              <div style={{display: 'flex', flexDirection: 'column'}}>
-               <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>Admin User</span>
-               <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Administrator</span>
+               <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                 {currentUser ? (currentUser.fullName || currentUser.email) : 'Admin User'}
+               </span>
+               <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
+                 {currentUser ? (currentUser.role === 'Admin' ? 'Administrator' : currentUser.role) : 'Administrator'}
+               </span>
              </div>
           </div>
         </header>

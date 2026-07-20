@@ -50,7 +50,11 @@ public class AuthController {
                 response.put("token", token);
                 
                 if (user != null) {
-                    response.put("user", Map.of("email", user.getEmail(), "role", user.getRole()));
+                    Map<String, Object> userMap = new HashMap<>();
+                    userMap.put("email", user.getEmail());
+                    userMap.put("role", user.getRole());
+                    userMap.put("fullName", user.getFullName() != null ? user.getFullName() : "");
+                    response.put("user", userMap);
                 }
                 
                 return ResponseEntity.ok(response);
@@ -145,6 +149,10 @@ public class AuthController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "User not found"));
         }
-        return ResponseEntity.ok(Map.of("email", user.getEmail(), "role", user.getRole()));
+        Map<String, Object> profileResponse = new HashMap<>();
+        profileResponse.put("email", user.getEmail());
+        profileResponse.put("role", user.getRole());
+        profileResponse.put("fullName", user.getFullName() != null ? user.getFullName() : "");
+        return ResponseEntity.ok(profileResponse);
     }
 }
