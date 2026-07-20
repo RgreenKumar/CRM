@@ -1,38 +1,78 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { LogIn, UserPlus, Mail, Lock, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
+
+const AuthLeftPane = () => (
+  <div className="auth-left">
+    <div className="auth-left-content">
+      <div className="auth-logo">*</div>
+    </div>
+    <div className="auth-left-content auth-left-text">
+      <div className="subtext">You can easily</div>
+      <h2>Get access your personal<br/>hub for clarity and<br/>productivity</h2>
+    </div>
+  </div>
+);
+
+const SocialButtons = () => (
+  <>
+    <div className="auth-divider">
+      <span>or continue with</span>
+    </div>
+    <div className="social-btns">
+      <button type="button" className="social-btn">Bē</button>
+      <button type="button" className="social-btn google">G</button>
+      <button type="button" className="social-btn facebook">f</button>
+    </div>
+  </>
+);
 
 export const LoginPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Mock login logic
     navigate('/dashboard');
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h2>Welcome Back</h2>
-        <p>Sign in to Scale CRM</p>
-        <form onSubmit={handleLogin}>
-          <div className="form-group">
-            <label>Email Address</label>
-            <input type="email" required className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" />
+    <div className="auth-page-wrapper">
+      <div className="auth-split-card">
+        <AuthLeftPane />
+        <div className="auth-right">
+          <div className="auth-logo">*</div>
+          <h2>Welcome back</h2>
+          <p className="desc">Access your tasks, notes, and projects anytime, anywhere - and keep everything flowing in one place.</p>
+          
+          <form onSubmit={handleLogin}>
+            <div className="auth-form-group">
+              <label>Your email</label>
+              <div className="auth-input-wrapper">
+                <input type="email" required className="auth-input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@email.com" />
+              </div>
+            </div>
+            <div className="auth-form-group">
+              <label>Password</label>
+              <div className="auth-input-wrapper">
+                <input type={showPassword ? "text" : "password"} required className="auth-input" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+                <span className="eye-icon" onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </span>
+              </div>
+            </div>
+            <button type="submit" className="auth-btn">
+              Get Started
+            </button>
+          </form>
+          
+          <SocialButtons />
+          
+          <div className="auth-footer">
+            Don't have an account? <Link to="/signup">Sign up</Link>
           </div>
-          <div className="form-group">
-            <label>Password</label>
-            <input type="password" required className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
-          </div>
-          <button type="submit" className="btn-primary">
-            Sign In <LogIn size={18} />
-          </button>
-        </form>
-        <div className="auth-link">
-          Don't have an account? <Link to="/signup">Sign up</Link>
         </div>
       </div>
     </div>
@@ -41,8 +81,9 @@ export const LoginPage = () => {
 
 export const SignupPage = () => {
   const navigate = useNavigate();
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSignup = (e) => {
     e.preventDefault();
@@ -50,25 +91,40 @@ export const SignupPage = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h2>Create Account</h2>
-        <p>Join Scale CRM today</p>
-        <form onSubmit={handleSignup}>
-          <div className="form-group">
-            <label>Full Name</label>
-            <input type="text" required className="form-control" value={name} onChange={(e) => setName(e.target.value)} placeholder="John Doe" />
+    <div className="auth-page-wrapper">
+      <div className="auth-split-card">
+        <AuthLeftPane />
+        <div className="auth-right">
+          <div className="auth-logo">*</div>
+          <h2>Create an account</h2>
+          <p className="desc">Access your tasks, notes, and projects anytime, anywhere - and keep everything flowing in one place.</p>
+          
+          <form onSubmit={handleSignup}>
+            <div className="auth-form-group">
+              <label>Your email</label>
+              <div className="auth-input-wrapper">
+                <input type="email" required className="auth-input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@email.com" />
+              </div>
+            </div>
+            <div className="auth-form-group">
+              <label>Password</label>
+              <div className="auth-input-wrapper">
+                <input type={showPassword ? "text" : "password"} required className="auth-input" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+                <span className="eye-icon" onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </span>
+              </div>
+            </div>
+            <button type="submit" className="auth-btn">
+              Get Started
+            </button>
+          </form>
+          
+          <SocialButtons />
+          
+          <div className="auth-footer">
+            Already have an account? <Link to="/login">Sign in</Link>
           </div>
-          <div className="form-group">
-            <label>Email Address</label>
-            <input type="email" required className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" />
-          </div>
-          <button type="submit" className="btn-primary">
-            Continue <ArrowRight size={18} />
-          </button>
-        </form>
-        <div className="auth-link">
-          Already have an account? <Link to="/login">Sign in</Link>
         </div>
       </div>
     </div>
@@ -85,19 +141,25 @@ export const VerifyEmailPage = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h2>Verify Email</h2>
-        <p>We've sent a code to your email address.</p>
-        <form onSubmit={handleVerify}>
-          <div className="form-group">
-            <label>Verification Code</label>
-            <input type="text" required className="form-control" value={code} onChange={(e) => setCode(e.target.value)} placeholder="000000" />
-          </div>
-          <button type="submit" className="btn-primary">
-            Verify <Mail size={18} />
-          </button>
-        </form>
+    <div className="auth-page-wrapper">
+      <div className="auth-split-card" style={{ maxWidth: '500px' }}>
+        <div className="auth-right" style={{ padding: '4rem' }}>
+          <div className="auth-logo" style={{ textAlign: 'center', display: 'block' }}>*</div>
+          <h2 style={{ textAlign: 'center' }}>Verify Email</h2>
+          <p className="desc" style={{ textAlign: 'center' }}>We've sent a code to your email address.</p>
+          
+          <form onSubmit={handleVerify}>
+            <div className="auth-form-group">
+              <label>Verification Code</label>
+              <div className="auth-input-wrapper">
+                <input type="text" required className="auth-input" value={code} onChange={(e) => setCode(e.target.value)} placeholder="000 000" style={{ textAlign: 'center', letterSpacing: '0.2em' }} />
+              </div>
+            </div>
+            <button type="submit" className="auth-btn">
+              Verify Account
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
@@ -107,6 +169,7 @@ export const CreatePasswordPage = () => {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleCreate = (e) => {
     e.preventDefault();
@@ -118,25 +181,33 @@ export const CreatePasswordPage = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h2>Secure Account</h2>
-        <p>Create a strong password</p>
-        <form onSubmit={handleCreate}>
-          <div className="form-group">
-            <label>New Password</label>
-            <input type="password" required className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
-          </div>
-          <div className="form-group">
-            <label>Confirm Password</label>
-            <input type="password" required className="form-control" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="••••••••" />
-          </div>
-          <button type="submit" className="btn-primary">
-            Set Password <Lock size={18} />
-          </button>
-        </form>
-        <div className="auth-link">
-          <Link to="/login">Go back to login</Link>
+    <div className="auth-page-wrapper">
+      <div className="auth-split-card" style={{ maxWidth: '500px' }}>
+        <div className="auth-right" style={{ padding: '4rem' }}>
+          <div className="auth-logo" style={{ textAlign: 'center', display: 'block' }}>*</div>
+          <h2 style={{ textAlign: 'center' }}>Secure Account</h2>
+          <p className="desc" style={{ textAlign: 'center' }}>Create a strong password for your new account.</p>
+          
+          <form onSubmit={handleCreate}>
+            <div className="auth-form-group">
+              <label>New Password</label>
+              <div className="auth-input-wrapper">
+                <input type={showPassword ? "text" : "password"} required className="auth-input" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+                <span className="eye-icon" onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </span>
+              </div>
+            </div>
+            <div className="auth-form-group">
+              <label>Confirm Password</label>
+              <div className="auth-input-wrapper">
+                <input type={showPassword ? "text" : "password"} required className="auth-input" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="••••••••" />
+              </div>
+            </div>
+            <button type="submit" className="auth-btn">
+              Set Password
+            </button>
+          </form>
         </div>
       </div>
     </div>
