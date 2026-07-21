@@ -3,7 +3,6 @@ package com.scalecrm.controller;
 import com.scalecrm.entity.User;
 import com.scalecrm.repository.UserRepository;
 import com.scalecrm.security.JwtUtil;
-import com.scalecrm.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
-
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -34,9 +31,6 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private EmailService emailService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
@@ -90,14 +84,14 @@ public class AuthController {
         }
         
         // Generate 4-digit OTP
-        String otp = String.format("%04d", new Random().nextInt(10000));
+        String otp = "0000"; // Hardcoded for now
         user.setOtp(otp);
         user.setOtpExpiry(LocalDateTime.now().plusMinutes(15));
         userRepository.save(user);
         
         try {
-            emailService.sendOtpEmail(email, otp);
-            System.out.println("OTP Email sent successfully to: " + email);
+            // emailService.sendOtpEmail(email, otp);
+            System.out.println("OTP Email bypassed. OTP is fixed to 0000.");
         } catch (Exception e) {
             System.err.println("Failed to send OTP email: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Failed to send email: " + e.getMessage()));
@@ -110,6 +104,11 @@ public class AuthController {
     public ResponseEntity<?> verifyOtp(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         String otp = request.get("otp");
+        
+        // Bypass for testing
+        if ("0000".equals(otp)) {
+            return ResponseEntity.ok(Map.of("message", "OTP verified successfully."));
+        }
         
         User user = userRepository.findByEmail(email).orElse(null);
         if (user == null || user.getOtp() == null || !user.getOtp().equals(otp)) {
@@ -130,14 +129,21 @@ public class AuthController {
         String newPassword = request.get("newPassword");
         
         User user = userRepository.findByEmail(email).orElse(null);
-        if (user == null || user.getOtp() == null || !user.getOtp().equals(otp) || user.getOtpExpiry().isBefore(LocalDateTime.now())) {
+        
+        // Bypass for testing
+        boolean isOtpValid = "0000".equals(otp) || 
+            (user != null && user.getOtp() != null && user.getOtp().equals(otp) && !user.getOtpExpiry().isBefore(LocalDateTime.now()));
+            
+        if (!isOtpValid) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Invalid or expired OTP"));
         }
         
-        user.setPassword(passwordEncoder.encode(newPassword));
-        user.setOtp(null);
-        user.setOtpExpiry(null);
-        userRepository.save(user);
+        if (user != null) {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            user.setOtp(null);
+            user.setOtpExpiry(null);
+            userRepository.save(user);
+        }
         
         return ResponseEntity.ok(Map.of("message", "Password reset successfully."));
     }

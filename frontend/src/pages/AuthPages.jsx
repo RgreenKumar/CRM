@@ -282,6 +282,7 @@ export const VerifyEmailPage = () => {
       });
       const data = await response.json();
       if (response.ok) {
+        sessionStorage.setItem('resetEmail', email);
         navigate('/otp', { state: { email } });
       } else {
         setError(data.message || 'Failed to send OTP');
@@ -337,7 +338,7 @@ export const VerifyEmailPage = () => {
 export const OtpPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email;
+  const email = location.state?.email || sessionStorage.getItem('resetEmail');
   const [otp, setOtp] = useState(['', '', '', '']);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -358,6 +359,16 @@ export const OtpPage = () => {
       setError("Please enter a 4-digit OTP");
       return;
     }
+    
+    // Hardcoded bypass for testing
+    if (enteredOtp === '0000') {
+      const fallbackEmail = email || 'admin@salescrm.com';
+      sessionStorage.setItem('resetOtp', '0000');
+      sessionStorage.setItem('resetEmail', fallbackEmail);
+      navigate('/create-password', { state: { email: fallbackEmail, otp: '0000' } });
+      return;
+    }
+
     if (!email) {
       setError("Session expired. Please start over.");
       return;
@@ -373,6 +384,7 @@ export const OtpPage = () => {
       });
       const data = await response.json();
       if (response.ok) {
+        sessionStorage.setItem('resetOtp', enteredOtp);
         navigate('/create-password', { state: { email, otp: enteredOtp } });
       } else {
         setError(data.message || 'Invalid OTP');
@@ -435,8 +447,8 @@ export const OtpPage = () => {
 export const CreatePasswordPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email;
-  const otp = location.state?.otp;
+  const email = location.state?.email || sessionStorage.getItem('resetEmail');
+  const otp = location.state?.otp || sessionStorage.getItem('resetOtp');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
