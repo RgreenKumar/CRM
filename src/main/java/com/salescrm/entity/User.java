@@ -12,6 +12,12 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column
+    private String name;
+
+    @Column
+    private String status = "Active";
+
     @Column(nullable = false)
     private String password;
 
@@ -49,4 +55,10 @@ public class User {
 
     public java.time.LocalDateTime getOtpExpiry() { return otpExpiry; }
     public void setOtpExpiry(java.time.LocalDateTime otpExpiry) { this.otpExpiry = otpExpiry; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }
