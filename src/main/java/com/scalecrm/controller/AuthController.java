@@ -3,6 +3,7 @@ package com.scalecrm.controller;
 import com.scalecrm.entity.User;
 import com.scalecrm.repository.UserRepository;
 import com.scalecrm.security.JwtUtil;
+import com.scalecrm.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,9 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EmailService emailService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
@@ -91,12 +95,15 @@ public class AuthController {
         user.setOtpExpiry(LocalDateTime.now().plusMinutes(15));
         userRepository.save(user);
         
-        System.out.println("==========================================");
-        System.out.println("MOCK EMAIL SENT TO: " + email);
-        System.out.println("YOUR OTP IS: " + otp);
-        System.out.println("==========================================");
+        try {
+            emailService.sendOtpEmail(email, otp);
+            System.out.println("OTP Email sent successfully to: " + email);
+        } catch (Exception e) {
+            System.err.println("Failed to send OTP email: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Failed to send email: " + e.getMessage()));
+        }
         
-        return ResponseEntity.ok(Map.of("message", "OTP sent successfully. (Testing OTP: " + otp + ")"));
+        return ResponseEntity.ok(Map.of("message", "OTP sent successfully."));
     }
 
     @PostMapping("/verify-otp")

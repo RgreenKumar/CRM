@@ -4,7 +4,7 @@ import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
 const DashboardOverview = ({ users }) => {
   const activeUsersCount = users.filter(u => u.status === 'Active').length;
   const totalLeadsCount = users.length;
-  
+
   const recentLeads = [
     { name: 'Rahul Kumar', email: 'rahul@tech.com', source: 'Website', status: 'New', statusClass: 'status-new', assignee: 'Sam Sales' },
     { name: 'Sophia Lee', email: 'sophia@startup.io', source: 'Referral', status: 'Contacted', statusClass: 'status-contacted', assignee: 'Sam Sales' },
@@ -214,18 +214,18 @@ const UserManagement = ({ users, setUsers }) => {
               <h3>{modalState.type === 'add' ? 'Add User' : 'Edit User'}</h3>
               <button className="modal-close" onClick={closeModal}>✕</button>
             </div>
-            
+
             <div className="form-group">
               <label className="form-label">Full Name *</label>
-              <input type="text" className="form-input" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="John Doe" />
+              <input type="text" className="form-input" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="John Doe" />
             </div>
             <div className="form-group">
               <label className="form-label">Email *</label>
-              <input type="email" className="form-input" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="john.doe@example.com" />
+              <input type="email" className="form-input" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} placeholder="john.doe@example.com" />
             </div>
             <div className="form-group">
               <label className="form-label">Role *</label>
-              <select className="form-select" value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})}>
+              <select className="form-select" value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })}>
                 <option value="Admin">Admin</option>
                 <option value="Sales Manager">Sales Manager</option>
                 <option value="Sales User">Sales User</option>
@@ -233,12 +233,12 @@ const UserManagement = ({ users, setUsers }) => {
             </div>
             <div className="form-group">
               <label className="form-label">Status *</label>
-              <select className="form-select" value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
+              <select className="form-select" value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })}>
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
             </div>
-            
+
             <div className="modal-footer">
               <button className="btn btn-outline" onClick={closeModal}>Cancel</button>
               <button className="btn btn-primary" onClick={handleSave}>{modalState.type === 'add' ? 'Save' : 'Update'}</button>
@@ -357,15 +357,15 @@ const Dashboard = () => {
           <div style={{ width: 36, height: 36, borderRadius: 8, background: '#3b82f6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem' }}>C</div>
           <h1>CRM<span>ADMIN</span></h1>
         </div>
-        
+
         <nav className="sidebar-nav">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
             return (
-              <Link 
-                key={item.path} 
-                to={item.path} 
+              <Link
+                key={item.path}
+                to={item.path}
                 className={`nav-item ${isActive ? 'active' : ''}`}
               >
                 <span style={{ fontSize: '1.25rem' }}>{item.icon}</span>
@@ -386,12 +386,12 @@ const Dashboard = () => {
       <main className="main-content">
         <header className="topbar">
           <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-primary)' }}>{currentNavItem.label}</h2>
-          <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
-             <div style={{width: 36, height: 36, borderRadius: '50%', background: '#3b82f6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600'}}>A</div>
-             <div style={{display: 'flex', flexDirection: 'column'}}>
-               <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>Admin User</span>
-               <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Administrator</span>
-             </div>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#3b82f6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600' }}>A</div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>Admin User</span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Administrator</span>
+            </div>
           </div>
         </header>
 
