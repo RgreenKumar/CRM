@@ -27,7 +27,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/h2-console/**", "/", "/index.html", "/static/**", "/assets/**", "/*.js", "/*.css", "/vite.svg", "/login", "/signup", "/dashboard", "/verify-email", "/otp", "/create-password", "/error").permitAll()
+                .requestMatchers("/api/auth/**", "/api/stages/**", "/h2-console/**", "/", "/index.html", "/static/**", "/assets/**", "/*.js", "/*.css", "/vite.svg", "/login", "/signup", "/dashboard", "/verify-email", "/otp", "/create-password", "/error").permitAll()
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())) // For H2 console
