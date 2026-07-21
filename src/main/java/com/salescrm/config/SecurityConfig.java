@@ -1,6 +1,6 @@
-package com.scalecrm.config;
+package com.salescrm.config;
 
-import com.scalecrm.security.JwtAuthFilter;
+import com.salescrm.security.JwtAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

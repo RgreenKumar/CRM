@@ -1,4 +1,4 @@
-package com.scalecrm.service;
+package com.salescrm.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -19,7 +19,7 @@ public class EmailService {
         message.setFrom(fromEmail);
         message.setTo(to);
         message.setSubject("Your OTP for Password Reset");
-        message.setText("Hello,\n\nYour OTP for password reset is: " + otp + "\n\nThis OTP will expire in 15 minutes.\n\nThank you,\nScaleCRM Team");
+        message.setText("Hello,\n\nYour OTP for password reset is: " + otp + "\n\nThis OTP will expire in 15 minutes.\n\nThank you,\nSales CRM Team");
         
         mailSender.send(message);
     }

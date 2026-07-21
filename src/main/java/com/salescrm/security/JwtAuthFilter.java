@@ -1,4 +1,4 @@
-package com.scalecrm.security;
+package com.salescrm.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

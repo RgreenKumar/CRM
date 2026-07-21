@@ -1,6 +1,6 @@
-# Scale CRM
+# Sales CRM
 
-Scale CRM is a modern Customer Relationship Management application built to help you manage your tasks, notes, and projects anytime, anywhere—keeping everything flowing in one place.
+Sales CRM is a modern Customer Relationship Management application built to help you manage your tasks, notes, and projects anytime, anywhere—keeping everything flowing in one place.
 
 ## Features
 - **Premium UI/UX:** A highly professional, responsive light theme with sleek micro-animations, built with React and Vite.

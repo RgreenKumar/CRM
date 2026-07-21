@@ -8,11 +8,11 @@
 		<version>3.2.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.scalecrm</groupId>
-	<artifactId>scalecrm</artifactId>
+	<groupId>com.salescrm</groupId>
+	<artifactId>salescrm</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>scalecrm</name>
-	<description>Scale CRM Project</description>
+	<name>salescrm</name>
+	<description>Sales CRM Project</description>
 	<properties>
 		<java.version>17</java.version>
 		<node.version>v20.11.0</node.version>

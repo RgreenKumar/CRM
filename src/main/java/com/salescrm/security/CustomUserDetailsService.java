@@ -1,7 +1,7 @@
-package com.scalecrm.security;
+package com.salescrm.security;
 
-import com.scalecrm.entity.User;
-import com.scalecrm.repository.UserRepository;
+import com.salescrm.entity.User;
+import com.salescrm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

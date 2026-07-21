@@ -1,4 +1,4 @@
-package com.scalecrm.security;
+package com.salescrm.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

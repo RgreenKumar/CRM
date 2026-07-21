@@ -1,4 +1,4 @@
-package com.scalecrm.entity;
+package com.salescrm.entity;
 
 import jakarta.persistence.*;
 

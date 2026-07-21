@@ -1,6 +1,6 @@
-package com.scalecrm.repository;
+package com.salescrm.repository;
 
-import com.scalecrm.entity.User;
+import com.salescrm.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

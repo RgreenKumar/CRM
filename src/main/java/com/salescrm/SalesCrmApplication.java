@@ -1,4 +1,4 @@
-package com.scalecrm;
+package com.salescrm;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @SpringBootApplication
 @Controller
-public class ScaleCrmApplication implements ErrorController {
+public class SalesCrmApplication implements ErrorController {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ScaleCrmApplication.class, args);
+		SpringApplication.run(SalesCrmApplication.class, args);
 	}
 
 	// Forward all unmapped requests (like React Router routes) to the index.html

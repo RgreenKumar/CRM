@@ -1,8 +1,8 @@
-package com.scalecrm.controller;
+package com.salescrm.controller;
 
-import com.scalecrm.entity.User;
-import com.scalecrm.repository.UserRepository;
-import com.scalecrm.security.JwtUtil;
+import com.salescrm.entity.User;
+import com.salescrm.repository.UserRepository;
+import com.salescrm.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
