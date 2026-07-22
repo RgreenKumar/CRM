@@ -25,11 +25,11 @@ const Dashboard = () => {
   ]);
 
   const [leads, setLeads] = useState([
-    { id: 1, name: 'Rahul Kumar', email: 'rahul@tech.com', phone: '9876543210', source: 'Website', status: 'New', assignedTo: 'Sam Sales' },
-    { id: 2, name: 'Sophia Lee', email: 'sophia@startup.io', phone: '9123456789', source: 'Referral', status: 'Contacted', assignedTo: 'Sam Sales' },
-    { id: 3, name: 'Mark Evans', email: 'mark@bigcorp.com', phone: '9988776655', source: 'Cold Call', status: 'Interested', assignedTo: 'Jake Johnson' },
-    { id: 4, name: 'Nisha Reddy', email: 'nisha@enterprise.in', phone: '8877665544', source: 'Social Media', status: 'Qualified', assignedTo: 'Priya Patel' },
-    { id: 5, name: 'Tom Wright', email: 'tom@solutions.net', phone: '7766554433', source: 'Website', status: 'Not Interested', assignedTo: 'Jake Johnson' }
+    { id: 1, name: 'Rahul Kumar', email: 'rahul@tech.com', phone: '9876543210', source: 'Website', status: 'New', assignedTo: 'Mike Johnson' },
+    { id: 2, name: 'Sophia Lee', email: 'sophia@startup.io', phone: '9123456789', source: 'Referral', status: 'Contacted', assignedTo: 'Mike Johnson' },
+    { id: 3, name: 'Mark Evans', email: 'mark@bigcorp.com', phone: '9988776655', source: 'Cold Call', status: 'Interested', assignedTo: 'Sarah Smith' },
+    { id: 4, name: 'Nisha Reddy', email: 'nisha@enterprise.in', phone: '8877665544', source: 'Social Media', status: 'Qualified', assignedTo: 'David Brown' },
+    { id: 5, name: 'Tom Wright', email: 'tom@solutions.net', phone: '7766554433', source: 'Website', status: 'Not Interested', assignedTo: 'Sarah Smith' }
   ]);
 
   const [contacts, setContacts] = useState([
@@ -45,11 +45,11 @@ const Dashboard = () => {
   ]);
 
   const [tasks, setTasks] = useState([
-    { id: 1, title: 'Follow up with Rahul', assignedTo: 'Sam Sales', dueDate: '2026-06-20', priority: 'High', status: 'Pending' },
-    { id: 2, title: 'Send proposal to Sophia', assignedTo: 'Sam Sales', dueDate: '2026-06-18', priority: 'Medium', status: 'In Progress' },
-    { id: 3, title: 'Demo call with Mark', assignedTo: 'Jake Johnson', dueDate: '2026-06-22', priority: 'High', status: 'Pending' },
-    { id: 4, title: 'Contract review Nisha', assignedTo: 'Priya Patel', dueDate: '2026-06-25', priority: 'Low', status: 'Done' },
-    { id: 5, title: 'send proposal to rahul', assignedTo: 'Balaji', dueDate: '2026-06-22', priority: 'Medium', status: 'Pending' }
+    { id: 1, title: 'Follow up with Rahul', assignedTo: 'Mike Johnson', dueDate: '2026-06-20', priority: 'High', status: 'Pending' },
+    { id: 2, title: 'Send proposal to Sophia', assignedTo: 'Mike Johnson', dueDate: '2026-06-18', priority: 'Medium', status: 'In Progress' },
+    { id: 3, title: 'Demo call with Mark', assignedTo: 'Sarah Smith', dueDate: '2026-06-22', priority: 'High', status: 'Pending' },
+    { id: 4, title: 'Contract review Nisha', assignedTo: 'David Brown', dueDate: '2026-06-25', priority: 'Low', status: 'Done' },
+    { id: 5, title: 'send proposal to rahul', assignedTo: 'John Doe', dueDate: '2026-06-22', priority: 'Medium', status: 'Pending' }
   ]);
 
   const handleSetLeads = (newLeads) => {
@@ -132,7 +132,7 @@ const Dashboard = () => {
             <Route path="/" element={<DashboardOverview users={users} leads={leads} deals={deals} />} />
             <Route path="/users" element={<UserManagement users={users} setUsers={setUsers} />} />
             <Route path="/roles" element={<RolesPermissions />} />
-            <Route path="/leads" element={<LeadsManagement leads={leads} setLeads={handleSetLeads} />} />
+            <Route path="/leads" element={<LeadsManagement leads={leads} setLeads={handleSetLeads} users={users} />} />
             <Route path="/contacts" element={<ContactManagement contacts={contacts} setContacts={setContacts} />} />
             <Route path="/deals" element={<DealsManagement deals={deals} setDeals={setDeals} contacts={contacts} />} />
             <Route path="/tasks" element={<TaskManagement tasks={tasks} setTasks={setTasks} users={users} />} />

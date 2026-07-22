@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const LeadsManagement = ({ leads, setLeads }) => {
+const LeadsManagement = ({ leads, setLeads, users }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -212,9 +212,9 @@ const LeadsManagement = ({ leads, setLeads }) => {
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', backgroundColor: 'white', boxSizing: 'border-box' }}
                 >
                   <option value="">-- Select User --</option>
-                  <option value="Sam Sales">Sam Sales</option>
-                  <option value="Jake Johnson">Jake Johnson</option>
-                  <option value="Priya Patel">Priya Patel</option>
+                  {users && users.map(u => (
+                    <option key={u.id} value={u.name}>{u.name}</option>
+                  ))}
                 </select>
               </div>
             </div>

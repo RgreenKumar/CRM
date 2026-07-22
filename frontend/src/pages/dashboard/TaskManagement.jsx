@@ -177,11 +177,7 @@ const TaskManagement = ({ tasks, setTasks, users }) => {
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', backgroundColor: 'white', boxSizing: 'border-box' }}
                 >
                   <option value="">-- Select User --</option>
-                  <option value="Sam Sales">Sam Sales</option>
-                  <option value="Jake Johnson">Jake Johnson</option>
-                  <option value="Priya Patel">Priya Patel</option>
-                  <option value="Balaji">Balaji</option>
-                  {users && users.filter(u => u.name && !["Sam Sales", "Jake Johnson", "Priya Patel", "Balaji"].includes(u.name)).map(u => (
+                  {users && users.map(u => (
                     <option key={u.id} value={u.name}>{u.name}</option>
                   ))}
                 </select>
