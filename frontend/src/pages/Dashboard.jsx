@@ -52,6 +52,18 @@ const Dashboard = () => {
     { id: 5, title: 'send proposal to rahul', assignedTo: 'Balaji', dueDate: '2026-06-22', priority: 'Medium', status: 'Pending' }
   ]);
 
+  const handleSetLeads = (newLeads) => {
+    // If leads are being deleted (new array is smaller)
+    if (newLeads.length < leads.length) {
+      const deletedLeads = leads.filter(l => !newLeads.find(nl => nl.id === l.id));
+      deletedLeads.forEach(deletedLead => {
+        setContacts(prev => prev.filter(c => c.name !== deletedLead.name));
+        setDeals(prev => prev.filter(d => d.contact !== deletedLead.name));
+      });
+    }
+    setLeads(newLeads);
+  };
+
   const handleLogout = () => {
     navigate('/login');
   };
@@ -120,7 +132,7 @@ const Dashboard = () => {
             <Route path="/" element={<DashboardOverview users={users} leads={leads} deals={deals} />} />
             <Route path="/users" element={<UserManagement users={users} setUsers={setUsers} />} />
             <Route path="/roles" element={<RolesPermissions />} />
-            <Route path="/leads" element={<LeadsManagement leads={leads} setLeads={setLeads} />} />
+            <Route path="/leads" element={<LeadsManagement leads={leads} setLeads={handleSetLeads} />} />
             <Route path="/contacts" element={<ContactManagement contacts={contacts} setContacts={setContacts} />} />
             <Route path="/deals" element={<DealsManagement deals={deals} setDeals={setDeals} contacts={contacts} />} />
             <Route path="/tasks" element={<TaskManagement tasks={tasks} setTasks={setTasks} users={users} />} />

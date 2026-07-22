@@ -412,6 +412,9 @@ export const OtpPage = () => {
           <h1>Sales CRM</h1>
           <h2 className="welcome-text">Welcome !</h2>
           <p className="subtitle">Enter your OTP to access your account</p>
+          <p style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '5px', marginBottom: '20px' }}>
+            (Check your spam folder if it's not in your inbox)
+          </p>
         </div>
         
         {error && <div className="auth-error">{error}</div>}
