@@ -42,16 +42,27 @@ const DashboardOverview = ({ users, leads = [], deals = [] }) => {
     }
   };
 
-  const revenueData = [
-    { month: 'Jan', height: '40%' },
-    { month: 'Feb', height: '60%' },
-    { month: 'Mar', height: '55%' },
-    { month: 'Apr', height: '70%' },
-    { month: 'May', height: '80%' },
-    { month: 'Jun', height: '85%' },
-    { month: 'Jul', height: '55%' },
-    { month: 'Aug', height: '100%' },
-  ];
+  const allMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const monthlyRevenue = {};
+  allMonths.forEach(m => monthlyRevenue[m] = 0);
+
+  wonDeals.forEach(deal => {
+    if (deal.closeDate) {
+      const date = new Date(deal.closeDate);
+      if (!isNaN(date)) {
+        const monthName = allMonths[date.getMonth()];
+        monthlyRevenue[monthName] += parseValue(deal.value);
+      }
+    }
+  });
+
+  const maxRevenue = Math.max(...Object.values(monthlyRevenue));
+
+  const revenueData = allMonths.map(month => {
+    const value = monthlyRevenue[month];
+    const height = maxRevenue > 0 ? `${(value / maxRevenue) * 100}%` : '0%';
+    return { month, height, value };
+  });
 
   return (
     <div>
@@ -153,7 +164,7 @@ const DashboardOverview = ({ users, leads = [], deals = [] }) => {
           <h3 className="panel-title">Monthly Revenue</h3>
           <div className="chart-container">
             {revenueData.map((data, index) => (
-              <div key={index} className="chart-bar-group">
+              <div key={index} className="chart-bar-group" title={formatCurrency(data.value)}>
                 <div className="chart-bar" style={{ height: data.height }}></div>
                 <div className="chart-label">{data.month}</div>
               </div>

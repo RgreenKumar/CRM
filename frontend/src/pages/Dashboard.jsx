@@ -39,16 +39,16 @@ const Dashboard = () => {
   ]);
 
   const [deals, setDeals] = useState([
-    { id: 1, title: 'Tech Solutions ERP Deal', contact: 'Rahul Kumar', value: '1,50,000', stage: 'Won', closeDate: '2025-05-30' },
-    { id: 2, title: 'StartupIO SaaS Package', contact: 'Amit Singh', value: '80,000', stage: 'Negotiation', closeDate: '2025-07-15' },
-    { id: 3, title: 'Enterprise India Contract', contact: 'Nisha Reddy', value: '2,20,000', stage: 'Proposal', closeDate: '2025-08-01' }
+    { id: 1, title: 'Tech Solutions ERP Deal', contact: 'Rahul Kumar', value: '1,50,000', stage: 'Won', closeDate: '2026-05-30' },
+    { id: 2, title: 'StartupIO SaaS Package', contact: 'Amit Singh', value: '80,000', stage: 'Negotiation', closeDate: '2026-07-15' },
+    { id: 3, title: 'Enterprise India Contract', contact: 'Nisha Reddy', value: '2,20,000', stage: 'Proposal', closeDate: '2026-08-01' }
   ]);
 
   const [tasks, setTasks] = useState([
-    { id: 1, title: 'Follow up with Rahul', assignedTo: 'Sam Sales', dueDate: '2025-06-20', priority: 'High', status: 'Pending' },
-    { id: 2, title: 'Send proposal to Sophia', assignedTo: 'Sam Sales', dueDate: '2025-06-18', priority: 'Medium', status: 'In Progress' },
-    { id: 3, title: 'Demo call with Mark', assignedTo: 'Jake Johnson', dueDate: '2025-06-22', priority: 'High', status: 'Pending' },
-    { id: 4, title: 'Contract review Nisha', assignedTo: 'Priya Patel', dueDate: '2025-06-25', priority: 'Low', status: 'Done' },
+    { id: 1, title: 'Follow up with Rahul', assignedTo: 'Sam Sales', dueDate: '2026-06-20', priority: 'High', status: 'Pending' },
+    { id: 2, title: 'Send proposal to Sophia', assignedTo: 'Sam Sales', dueDate: '2026-06-18', priority: 'Medium', status: 'In Progress' },
+    { id: 3, title: 'Demo call with Mark', assignedTo: 'Jake Johnson', dueDate: '2026-06-22', priority: 'High', status: 'Pending' },
+    { id: 4, title: 'Contract review Nisha', assignedTo: 'Priya Patel', dueDate: '2026-06-25', priority: 'Low', status: 'Done' },
     { id: 5, title: 'send proposal to rahul', assignedTo: 'Balaji', dueDate: '2026-06-22', priority: 'Medium', status: 'Pending' }
   ]);
 

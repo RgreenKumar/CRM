@@ -7,7 +7,7 @@ export const useSettings = () => {
 };
 
 export const SettingsProvider = ({ children }) => {
-  const [currency, setCurrency] = useState({ label: 'USD - US Dollar', symbol: '$' });
+  const [currency, setCurrency] = useState({ label: 'INR - Indian Rupee', symbol: '₹' });
   const [pipelineStages, setPipelineStagesState] = useState([]);
   const [companyName, setCompanyName] = useState('Your Company');
   const [timeZone, setTimeZone] = useState('UTC+5:30 (India)');
@@ -66,6 +66,18 @@ export const SettingsProvider = ({ children }) => {
     }
   };
 
+  const [emailIntegration, setEmailIntegration] = useState({
+    email: 'admin@yourcompany.com',
+    provider: 'SMTP',
+    password: '',
+    connected: true
+  });
+  const [apiIntegration, setApiIntegration] = useState({
+    endpoint: 'https://api.yourservice.com',
+    apiKey: '',
+    connected: true
+  });
+
   const value = {
     currency,
     setCurrency,
@@ -78,7 +90,11 @@ export const SettingsProvider = ({ children }) => {
     timeZone,
     setTimeZone,
     dateFormat,
-    setDateFormat
+    setDateFormat,
+    emailIntegration,
+    setEmailIntegration,
+    apiIntegration,
+    setApiIntegration
   };
 
   return (
