@@ -88,28 +88,28 @@ const ReportAnalysis = ({ leads, deals }) => {
       XLSX.writeFile(wb, "won_deals_report.xlsx");
     } else if (type === 'pdf') {
       const doc = new jsPDF();
-      
+
       const pageWidth = doc.internal.pageSize.getWidth();
-      
+
       // Top Center Company Name
       doc.setFontSize(22);
       doc.setTextColor(31, 41, 55);
       doc.text(companyName || 'Company Name', pageWidth / 2, 20, { align: 'center' });
-      
+
       // Separator Line
       doc.setDrawColor(229, 231, 235);
       doc.setLineWidth(0.5);
       doc.line(14, 28, pageWidth - 14, 28);
-      
+
       // Title & Dates
       doc.setFontSize(16);
       doc.setTextColor(17, 24, 39);
       doc.text("Won Deals Report", 14, 40);
-      
+
       doc.setFontSize(11);
       doc.setTextColor(107, 114, 128);
       doc.text(`Date Range: ${fromDate || 'All time'} to ${toDate || 'All time'}`, 14, 48);
-      
+
       // PDF Currency formatter avoids unicode symbols (like ₹) which corrupt standard jsPDF fonts
       const formatCurrencyForPdf = (num) => {
         const code = currency?.label?.split(' ')[0] || 'Rs.';
@@ -119,12 +119,12 @@ const ReportAnalysis = ({ leads, deals }) => {
       // Summary Stats
       const totalDeals = filteredDeals.length;
       const totalRevenue = filteredDeals.reduce((sum, d) => sum + parseValue(d.value), 0);
-      
+
       doc.setFontSize(11);
       doc.setTextColor(17, 24, 39);
       doc.text(`Total Deals: ${totalDeals}`, pageWidth - 14, 40, { align: 'right' });
       doc.text(`Total Revenue: ${formatCurrencyForPdf(totalRevenue)}`, pageWidth - 14, 46, { align: 'right' });
-      
+
       doc.setFontSize(10);
       doc.setTextColor(156, 163, 175);
       doc.text(`Generated on: ${new Date().toLocaleDateString()}`, pageWidth - 14, 52, { align: 'right' });
@@ -155,7 +155,7 @@ const ReportAnalysis = ({ leads, deals }) => {
         },
         alternateRowStyles: { fillColor: [249, 250, 251] }
       });
-      
+
       doc.save(`won_deals_report_${new Date().toISOString().split('T')[0]}.pdf`);
     }
 
@@ -173,7 +173,7 @@ const ReportAnalysis = ({ leads, deals }) => {
     const spDeals = deals.filter(d => getSalespersonForDeal(d) === sp);
     const openDeals = spDeals.filter(d => d.status === 'Open').length;
     const dealsWon = spDeals.filter(d => d.status === 'Won').length;
-    
+
     return {
       salesperson: sp,
       totalLeads,
@@ -188,7 +188,7 @@ const ReportAnalysis = ({ leads, deals }) => {
         <div className="card" style={{ padding: 0, overflow: 'hidden', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '24px' }}>
           <div style={{ padding: '20px 24px', borderBottom: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h3 style={{ margin: 0, fontSize: '16px', color: '#1f2937', fontWeight: '600' }}>Sales Report — Deals Won by Salesperson</h3>
-            <button 
+            <button
               onClick={() => setIsDownloadModalOpen(true)}
               style={{ backgroundColor: '#10b981', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
             >
@@ -252,22 +252,22 @@ const ReportAnalysis = ({ leads, deals }) => {
               <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#111827' }}>Download Report</h2>
               <button onClick={() => setIsDownloadModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#6b7280' }}>&times;</button>
             </div>
-            
+
             <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>From Date</label>
-                <input 
-                  type="date" 
-                  value={fromDate} 
+                <input
+                  type="date"
+                  value={fromDate}
                   onChange={(e) => setFromDate(e.target.value)}
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}
                 />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>To Date</label>
-                <input 
-                  type="date" 
-                  value={toDate} 
+                <input
+                  type="date"
+                  value={toDate}
                   onChange={(e) => setToDate(e.target.value)}
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}
                 />
@@ -275,26 +275,26 @@ const ReportAnalysis = ({ leads, deals }) => {
             </div>
 
             <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', gap: '12px', borderBottomLeftRadius: '8px', borderBottomRightRadius: '8px', backgroundColor: '#f9fafb' }}>
-              <button 
+              <button
                 onClick={() => setIsDownloadModalOpen(false)}
                 style={{ padding: '8px 16px', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', color: '#374151' }}
               >
                 Cancel
               </button>
               <div style={{ display: 'flex', gap: '8px' }}>
-                <button 
+                <button
                   onClick={() => handleDownload('csv')}
                   style={{ padding: '8px 16px', backgroundColor: '#3b82f6', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', color: 'white' }}
                 >
                   CSV
                 </button>
-                <button 
+                <button
                   onClick={() => handleDownload('excel')}
                   style={{ padding: '8px 16px', backgroundColor: '#10b981', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', color: 'white' }}
                 >
                   Excel
                 </button>
-                <button 
+                <button
                   onClick={() => handleDownload('pdf')}
                   style={{ padding: '8px 16px', backgroundColor: '#ef4444', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', color: 'white' }}
                 >
