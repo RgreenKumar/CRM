@@ -42,6 +42,9 @@ public class PipelineStageController {
             if (stageDetails.getSortOrder() != null) {
                 stage.setSortOrder(stageDetails.getSortOrder());
             }
+            if (stageDetails.getStatus() != null) {
+                stage.setStatus(stageDetails.getStatus());
+            }
             return ResponseEntity.ok(stageRepository.save(stage));
         } else {
             return ResponseEntity.notFound().build();

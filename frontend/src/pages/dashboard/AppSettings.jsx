@@ -20,6 +20,7 @@ const AppSettings = () => {
   const [modalType, setModalType] = useState('add');
   const [currentStageName, setCurrentStageName] = useState('');
   const [currentStageColor, setCurrentStageColor] = useState('#3b82f6');
+  const [currentStageStatus, setCurrentStageStatus] = useState('Open');
   const [editId, setEditId] = useState(null);
 
   // Integration Modal State
@@ -50,6 +51,7 @@ const AppSettings = () => {
     setModalType('add');
     setCurrentStageName('');
     setCurrentStageColor('#3b82f6');
+    setCurrentStageStatus('Open');
     setIsModalOpen(true);
   };
 
@@ -57,6 +59,11 @@ const AppSettings = () => {
     setModalType('edit');
     setCurrentStageName(stage.name);
     setCurrentStageColor(stage.color || '#3b82f6');
+    if (stage.name.toLowerCase().includes('won')) {
+      setCurrentStageStatus('Won');
+    } else {
+      setCurrentStageStatus(stage.status || 'Open');
+    }
     setEditId(stage.id);
     setIsModalOpen(true);
   };
@@ -68,12 +75,14 @@ const AppSettings = () => {
       addPipelineStage({ 
         name: currentStageName.trim(), 
         color: currentStageColor,
+        status: currentStageStatus,
         sortOrder: pipelineStages.length 
       });
     } else if (modalType === 'edit' && editId !== null) {
       updatePipelineStage(editId, { 
         name: currentStageName.trim(), 
-        color: currentStageColor 
+        color: currentStageColor,
+        status: currentStageStatus
       });
     }
     setIsModalOpen(false);
@@ -367,6 +376,20 @@ const AppSettings = () => {
                   />
                   <span style={{ fontSize: '14px', color: '#6b7280', fontFamily: 'monospace' }}>{currentStageColor}</span>
                 </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>Stage Status (Deals in this stage will be marked as:)</label>
+                <select 
+                  value={currentStageStatus}
+                  onChange={(e) => setCurrentStageStatus(e.target.value)}
+                  disabled={modalType === 'edit'}
+                  style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box', backgroundColor: modalType === 'edit' ? '#f3f4f6' : 'white', cursor: modalType === 'edit' ? 'not-allowed' : 'auto' }}
+                >
+                  <option value="Open">Open</option>
+                  <option value="Won">Won</option>
+                  <option value="Lost">Lost</option>
+                </select>
               </div>
             </div>
 

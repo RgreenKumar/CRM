@@ -8,7 +8,7 @@ const DealsManagement = ({ deals, setDeals, contacts }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add');
   const [currentDeal, setCurrentDeal] = useState({ title: '', contact: '', value: '', stage: pipelineStages[0]?.name || 'Proposal', closeDate: '' });
-  const [dealToDelete, setDealToDelete] = useState(null);
+  const [editId, setEditId] = useState(null);
 
   const filteredDeals = deals.filter(deal => {
     const query = searchQuery.toLowerCase();
@@ -30,7 +30,7 @@ const DealsManagement = ({ deals, setDeals, contacts }) => {
   };
 
   const getStageStyle = (stageName) => {
-    const stageObj = pipelineStages.find(s => s.name === stageName);
+    const stageObj = pipelineStages.find(s => s.name === stageName || s.name.toLowerCase().includes(stageName.toLowerCase()));
     if (stageObj && stageObj.color) {
       return { 
         backgroundColor: hexToRgba(stageObj.color, 0.15), 
@@ -44,6 +44,11 @@ const DealsManagement = ({ deals, setDeals, contacts }) => {
     return { backgroundColor: 'rgba(249, 115, 22, 0.15)', color: '#f97316', border: '1px solid rgba(249, 115, 22, 0.2)' };
   };
 
+  const getDealStatus = (dealStage) => {
+    const stageObj = pipelineStages.find(s => s.name === dealStage || s.name.toLowerCase().includes(dealStage.toLowerCase()));
+    return stageObj ? (stageObj.status || 'Open') : 'Open';
+  };
+
   const handleAddClick = () => {
     setModalType('add');
     setCurrentDeal({ title: '', contact: '', value: '', stage: pipelineStages[0]?.name || 'Proposal', closeDate: '' });
@@ -53,6 +58,7 @@ const DealsManagement = ({ deals, setDeals, contacts }) => {
   const handleEditClick = (deal) => {
     setModalType('edit');
     setCurrentDeal(deal);
+    setEditId(deal.id);
     setIsModalOpen(true);
   };
 
@@ -65,7 +71,7 @@ const DealsManagement = ({ deals, setDeals, contacts }) => {
     if (modalType === 'add') {
       setDeals([...deals, { ...currentDeal, id: Date.now() }]);
     } else {
-      setDeals(deals.map(d => d.id === currentDeal.id ? currentDeal : d));
+      setDeals(deals.map(d => d.id === editId ? currentDeal : d));
     }
     setIsModalOpen(false);
   };
@@ -74,6 +80,8 @@ const DealsManagement = ({ deals, setDeals, contacts }) => {
     setDeals(deals.filter(d => d.id !== dealToDelete.id));
     setIsDeleteModalOpen(false);
   };
+
+  const [dealToDelete, setDealToDelete] = useState(null);
 
   const modalOverlayStyle = {
     position: 'fixed',
@@ -113,6 +121,7 @@ const DealsManagement = ({ deals, setDeals, contacts }) => {
               <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>CONTACT</th>
               <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>VALUE</th>
               <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>STAGE</th>
+              <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>STATUS</th>
               <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>CLOSE DATE</th>
               <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb', textAlign: 'center' }}>ACTIONS</th>
             </tr>
@@ -132,6 +141,15 @@ const DealsManagement = ({ deals, setDeals, contacts }) => {
                     fontWeight: '500' 
                   }}>
                     {deal.stage}
+                  </span>
+                </td>
+                <td style={{ padding: '16px 24px' }}>
+                  <span style={{
+                    backgroundColor: getDealStatus(deal.stage) === 'Won' ? '#dcfce7' : getDealStatus(deal.stage) === 'Lost' ? '#fee2e2' : '#f3f4f6',
+                    color: getDealStatus(deal.stage) === 'Won' ? '#166534' : getDealStatus(deal.stage) === 'Lost' ? '#991b1b' : '#374151',
+                    padding: '4px 12px', borderRadius: '9999px', fontSize: '12px', fontWeight: '500'
+                  }}>
+                    {getDealStatus(deal.stage)}
                   </span>
                 </td>
                 <td style={{ padding: '16px 24px', color: '#6b7280', fontSize: '14px' }}>{deal.closeDate}</td>

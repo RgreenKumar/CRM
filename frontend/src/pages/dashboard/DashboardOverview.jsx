@@ -3,7 +3,6 @@ import { useSettings } from '../../context/SettingsContext';
 
 const DashboardOverview = ({ users, leads = [], deals = [] }) => {
   const { currency, pipelineStages } = useSettings();
-  const wonStage = pipelineStages[pipelineStages.length - 1]?.name || 'Closed Won';
 
   const activeUsersCount = users.filter(u => u.status === 'Active').length;
   const activeLeads = leads.filter(l => l.status !== 'Not Interested');
@@ -22,8 +21,13 @@ const DashboardOverview = ({ users, leads = [], deals = [] }) => {
     return currency.symbol + num.toLocaleString('en-IN');
   };
 
+  const getDealStatus = (dealStage) => {
+    const stageObj = pipelineStages.find(s => s.name === dealStage || s.name.toLowerCase().includes(dealStage.toLowerCase()));
+    return stageObj ? (stageObj.status || 'Open') : 'Open';
+  };
+
   const totalDeals = deals.length;
-  const wonDeals = deals.filter(d => d.stage === wonStage || d.stage === 'Won');
+  const wonDeals = deals.filter(d => getDealStatus(d.stage) === 'Won');
   const wonDealsCount = wonDeals.length;
   const totalRevenue = wonDeals.reduce((sum, d) => sum + parseValue(d.value), 0);
   

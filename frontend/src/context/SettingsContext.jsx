@@ -18,7 +18,13 @@ export const SettingsProvider = ({ children }) => {
     fetch('http://localhost:8080/api/stages')
       .then(res => res.json())
       .then(data => {
-        setPipelineStagesState(data);
+        // Enforce defaults based on name for existing data
+        const enrichedData = data.map(stage => {
+          if (stage.name.toLowerCase().includes('won')) return { ...stage, status: 'Won' };
+          if (stage.name.toLowerCase().includes('lost')) return { ...stage, status: 'Lost' };
+          return { ...stage, status: stage.status || 'Open' };
+        });
+        setPipelineStagesState(enrichedData);
       })
       .catch(err => console.error("Failed to fetch pipeline stages:", err));
   }, []);

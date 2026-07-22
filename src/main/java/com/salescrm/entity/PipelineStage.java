@@ -21,4 +21,6 @@ public class PipelineStage {
     private String color;
 
     private Integer sortOrder;
+
+    private String status = "Open"; // Can be Open, Won, or Lost
 }

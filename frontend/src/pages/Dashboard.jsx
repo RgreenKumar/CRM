@@ -39,9 +39,9 @@ const Dashboard = () => {
   ]);
 
   const [deals, setDeals] = useState([
-    { id: 1, title: 'Tech Solutions ERP Deal', contact: 'Rahul Kumar', value: '1,50,000', stage: 'Won', closeDate: '2026-05-30' },
-    { id: 2, title: 'StartupIO SaaS Package', contact: 'Amit Singh', value: '80,000', stage: 'Negotiation', closeDate: '2026-07-15' },
-    { id: 3, title: 'Enterprise India Contract', contact: 'Nisha Reddy', value: '2,20,000', stage: 'Proposal', closeDate: '2026-08-01' }
+    { id: 1, title: 'Tech Solutions ERP Deal', contact: 'Rahul Kumar', value: '1,50,000', stage: 'Won', status: 'Won', closeDate: '2026-05-30' },
+    { id: 2, title: 'StartupIO SaaS Package', contact: 'Amit Singh', value: '80,000', stage: 'Negotiation', status: 'Open', closeDate: '2026-07-15' },
+    { id: 3, title: 'Enterprise India Contract', contact: 'Nisha Reddy', value: '2,20,000', stage: 'Proposal', status: 'Open', closeDate: '2026-08-01' }
   ]);
 
   const [tasks, setTasks] = useState([
