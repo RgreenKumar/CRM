@@ -123,7 +123,7 @@ export const LoginPage = () => {
               className={`auth-input ${emailError ? 'auth-input-error' : ''}`}
               value={email} 
               onChange={(e) => { setEmail(e.target.value); setEmailError(''); }} 
-              placeholder="admin@salescrm.com" 
+              placeholder="User Email id" 
             />
             {emailError && <span style={{ color: 'var(--error-color)', fontSize: '0.875rem', marginTop: '0.25rem' }}>{emailError}</span>}
           </div>
@@ -233,7 +233,7 @@ export const SignupPage = () => {
               className="auth-input" 
               value={name} 
               onChange={(e) => setName(e.target.value)} 
-              placeholder="John Doe" 
+              placeholder="User Name" 
             />
           </div>
           
@@ -245,7 +245,7 @@ export const SignupPage = () => {
               className="auth-input" 
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
-              placeholder="admin@salescrm.com" 
+              placeholder="User Email id" 
             />
           </div>
           

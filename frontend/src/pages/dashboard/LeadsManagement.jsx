@@ -49,17 +49,38 @@ const LeadsManagement = ({ leads, setLeads, users }) => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleSaveLead = () => {
+  const handleSaveLead = async () => {
+    const token = localStorage.getItem('token');
+    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+
     if (modalType === 'add') {
-      setLeads([...leads, { ...currentLead, id: Date.now() }]);
+      try {
+        const res = await fetch('/api/leads', { method: 'POST', headers, body: JSON.stringify(currentLead) });
+        if (res.ok) {
+          const newLead = await res.json();
+          setLeads([...leads, newLead]);
+        }
+      } catch (err) { console.error(err); }
     } else {
-      setLeads(leads.map(l => l.id === currentLead.id ? currentLead : l));
+      try {
+        const res = await fetch(`/api/leads/${currentLead.id}`, { method: 'PUT', headers, body: JSON.stringify(currentLead) });
+        if (res.ok) {
+          const updatedLead = await res.json();
+          setLeads(leads.map(l => l.id === currentLead.id ? updatedLead : l));
+        }
+      } catch (err) { console.error(err); }
     }
     setIsModalOpen(false);
   };
 
-  const confirmDelete = () => {
-    setLeads(leads.filter(l => l.id !== leadToDelete.id));
+  const confirmDelete = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`/api/leads/${leadToDelete.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+      if (res.ok) {
+        setLeads(leads.filter(l => l.id !== leadToDelete.id));
+      }
+    } catch (err) { console.error(err); }
     setIsDeleteModalOpen(false);
   };
 

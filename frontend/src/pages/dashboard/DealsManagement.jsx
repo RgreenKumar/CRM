@@ -67,17 +67,38 @@ const DealsManagement = ({ deals, setDeals, contacts }) => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleSaveDeal = () => {
+  const handleSaveDeal = async () => {
+    const token = localStorage.getItem('token');
+    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+
     if (modalType === 'add') {
-      setDeals([...deals, { ...currentDeal, id: Date.now() }]);
+      try {
+        const res = await fetch('/api/deals', { method: 'POST', headers, body: JSON.stringify(currentDeal) });
+        if (res.ok) {
+          const newDeal = await res.json();
+          setDeals([...deals, newDeal]);
+        }
+      } catch (err) { console.error(err); }
     } else {
-      setDeals(deals.map(d => d.id === editId ? currentDeal : d));
+      try {
+        const res = await fetch(`/api/deals/${editId}`, { method: 'PUT', headers, body: JSON.stringify(currentDeal) });
+        if (res.ok) {
+          const updatedDeal = await res.json();
+          setDeals(deals.map(d => d.id === editId ? updatedDeal : d));
+        }
+      } catch (err) { console.error(err); }
     }
     setIsModalOpen(false);
   };
 
-  const confirmDelete = () => {
-    setDeals(deals.filter(d => d.id !== dealToDelete.id));
+  const confirmDelete = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`/api/deals/${dealToDelete.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+      if (res.ok) {
+        setDeals(deals.filter(d => d.id !== dealToDelete.id));
+      }
+    } catch (err) { console.error(err); }
     setIsDeleteModalOpen(false);
   };
 

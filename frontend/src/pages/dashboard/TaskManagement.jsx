@@ -60,17 +60,38 @@ const TaskManagement = ({ tasks, setTasks, users }) => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleSaveTask = () => {
+  const handleSaveTask = async () => {
+    const token = localStorage.getItem('token');
+    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+
     if (modalType === 'add') {
-      setTasks([...tasks, { ...currentTask, id: Date.now() }]);
+      try {
+        const res = await fetch('/api/tasks', { method: 'POST', headers, body: JSON.stringify(currentTask) });
+        if (res.ok) {
+          const newTask = await res.json();
+          setTasks([...tasks, newTask]);
+        }
+      } catch (err) { console.error(err); }
     } else {
-      setTasks(tasks.map(t => t.id === currentTask.id ? currentTask : t));
+      try {
+        const res = await fetch(`/api/tasks/${currentTask.id}`, { method: 'PUT', headers, body: JSON.stringify(currentTask) });
+        if (res.ok) {
+          const updatedTask = await res.json();
+          setTasks(tasks.map(t => t.id === currentTask.id ? updatedTask : t));
+        }
+      } catch (err) { console.error(err); }
     }
     setIsModalOpen(false);
   };
 
-  const confirmDelete = () => {
-    setTasks(tasks.filter(t => t.id !== taskToDelete.id));
+  const confirmDelete = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`/api/tasks/${taskToDelete.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+      if (res.ok) {
+        setTasks(tasks.filter(t => t.id !== taskToDelete.id));
+      }
+    } catch (err) { console.error(err); }
     setIsDeleteModalOpen(false);
   };
 

@@ -6,9 +6,13 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Download } from 'lucide-react';
 
-const ReportAnalysis = ({ leads, deals }) => {
+const ReportAnalysis = ({ users = [], leads, deals }) => {
   const { currency, pipelineStages, companyName } = useSettings();
-  const salespersons = [...new Set(leads.map(lead => lead.assignedTo))].filter(Boolean);
+  
+  // Get all users from the system to show everyone in the report
+  const salespersons = users.length > 0 
+    ? users.map(u => u.name).filter(Boolean)
+    : [...new Set(leads.map(lead => lead.assignedTo))].filter(Boolean);
 
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [fromDate, setFromDate] = useState('');

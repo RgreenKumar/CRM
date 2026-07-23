@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Users, ShieldCheck, Lightbulb, Contact, Handshake, ClipboardList, BarChart2, Settings, LogOut } from 'lucide-react';
 
@@ -16,41 +16,43 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [users, setUsers] = useState([
-    { id: 1, name: 'John Doe', email: 'john.doe@example.com', role: 'Admin', status: 'Active' },
-    { id: 2, name: 'Sarah Smith', email: 'sarah.smith@example.com', role: 'Sales Manager', status: 'Active' },
-    { id: 3, name: 'Mike Johnson', email: 'mike.johnson@example.com', role: 'Sales User', status: 'Active' },
-    { id: 4, name: 'Emily Davis', email: 'emily.davis@example.com', role: 'Sales User', status: 'Inactive' },
-    { id: 5, name: 'David Brown', email: 'david.brown@example.com', role: 'Sales User', status: 'Active' },
-  ]);
+  const userStr = localStorage.getItem('user');
+  const loggedInUser = userStr ? JSON.parse(userStr) : null;
+  const displayName = loggedInUser?.name || 'Admin User';
+  const displayEmail = loggedInUser?.email || 'admin@example.com';
+  const displayRole = loggedInUser?.role === 'ROLE_USER' ? 'Admin' : (loggedInUser?.role || 'Admin');
 
-  const [leads, setLeads] = useState([
-    { id: 1, name: 'Rahul Kumar', email: 'rahul@tech.com', phone: '9876543210', source: 'Website', status: 'New', assignedTo: 'Mike Johnson' },
-    { id: 2, name: 'Sophia Lee', email: 'sophia@startup.io', phone: '9123456789', source: 'Referral', status: 'Contacted', assignedTo: 'Mike Johnson' },
-    { id: 3, name: 'Mark Evans', email: 'mark@bigcorp.com', phone: '9988776655', source: 'Cold Call', status: 'Interested', assignedTo: 'Sarah Smith' },
-    { id: 4, name: 'Nisha Reddy', email: 'nisha@enterprise.in', phone: '8877665544', source: 'Social Media', status: 'Qualified', assignedTo: 'David Brown' },
-    { id: 5, name: 'Tom Wright', email: 'tom@solutions.net', phone: '7766554433', source: 'Website', status: 'Not Interested', assignedTo: 'Sarah Smith' }
-  ]);
+  const [users, setUsers] = useState([]);
+  const [leads, setLeads] = useState([]);
+  const [contacts, setContacts] = useState([]);
+  const [deals, setDeals] = useState([]);
+  const [tasks, setTasks] = useState([]);
 
-  const [contacts, setContacts] = useState([
-    { id: 1, name: 'Rahul Kumar', email: 'rahul@tech.com', phone: '9876543210', company: 'Tech Solutions Pvt Ltd', designation: 'CTO' },
-    { id: 2, name: 'Sophia Lee', email: 'sophia@startup.io', phone: '9123456789', company: 'StartupIO', designation: 'CEO' },
-    { id: 3, name: 'Nisha Reddy', email: 'nisha@enterprise.in', phone: '8877665544', company: 'Enterprise India', designation: 'Procurement Head' }
-  ]);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const headers = { 'Authorization': `Bearer ${token}` };
 
-  const [deals, setDeals] = useState([
-    { id: 1, title: 'Tech Solutions ERP Deal', contact: 'Rahul Kumar', value: '1,50,000', stage: 'Won', status: 'Won', closeDate: '2026-05-30' },
-    { id: 2, title: 'StartupIO SaaS Package', contact: 'Amit Singh', value: '80,000', stage: 'Negotiation', status: 'Open', closeDate: '2026-07-15' },
-    { id: 3, title: 'Enterprise India Contract', contact: 'Nisha Reddy', value: '2,20,000', stage: 'Proposal', status: 'Open', closeDate: '2026-08-01' }
-  ]);
-
-  const [tasks, setTasks] = useState([
-    { id: 1, title: 'Follow up with Rahul', assignedTo: 'Mike Johnson', dueDate: '2026-06-20', priority: 'High', status: 'Pending' },
-    { id: 2, title: 'Send proposal to Sophia', assignedTo: 'Mike Johnson', dueDate: '2026-06-18', priority: 'Medium', status: 'In Progress' },
-    { id: 3, title: 'Demo call with Mark', assignedTo: 'Sarah Smith', dueDate: '2026-06-22', priority: 'High', status: 'Pending' },
-    { id: 4, title: 'Contract review Nisha', assignedTo: 'David Brown', dueDate: '2026-06-25', priority: 'Low', status: 'Done' },
-    { id: 5, title: 'send proposal to rahul', assignedTo: 'John Doe', dueDate: '2026-06-22', priority: 'Medium', status: 'Pending' }
-  ]);
+    // Fetch all entities from backend
+    Promise.all([
+      fetch('/api/users', { headers }).then(res => res.json()),
+      fetch('/api/leads', { headers }).then(res => res.json()),
+      fetch('/api/contacts', { headers }).then(res => res.json()),
+      fetch('/api/deals', { headers }).then(res => res.json()),
+      fetch('/api/tasks', { headers }).then(res => res.json())
+    ]).then(([usersData, leadsData, contactsData, dealsData, tasksData]) => {
+      // Map the logged-in user to the top of the users array if needed, or just let DB data govern
+      if (Array.isArray(usersData)) {
+        // Ensure the logged in user is at the top
+        const others = usersData.filter(u => u.email !== displayEmail);
+        const self = usersData.find(u => u.email === displayEmail);
+        setUsers(self ? [self, ...others] : usersData);
+      }
+      if (Array.isArray(leadsData)) setLeads(leadsData);
+      if (Array.isArray(contactsData)) setContacts(contactsData);
+      if (Array.isArray(dealsData)) setDeals(dealsData);
+      if (Array.isArray(tasksData)) setTasks(tasksData);
+    }).catch(err => console.error("Error fetching data", err));
+  }, [displayEmail]);
 
   const handleSetLeads = (newLeads) => {
     // If leads are being deleted (new array is smaller)
@@ -82,10 +84,7 @@ const Dashboard = () => {
 
   const currentNavItem = navItems.find(item => location.pathname === item.path) || navItems[0];
 
-  const userStr = localStorage.getItem('user');
-  const user = userStr ? JSON.parse(userStr) : null;
-  const displayName = user?.name || 'Admin User';
-  const displayRole = user?.role === 'ROLE_USER' ? 'User' : 'Administrator';
+  const displayHeaderRole = loggedInUser?.role === 'ROLE_USER' ? 'Administrator' : 'Administrator';
   const avatarLetter = displayName.charAt(0).toUpperCase();
 
   return (
@@ -128,7 +127,7 @@ const Dashboard = () => {
             <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#3b82f6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600' }}>{avatarLetter}</div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>{displayName}</span>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{displayRole}</span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{displayHeaderRole}</span>
             </div>
           </div>
         </header>
@@ -136,13 +135,13 @@ const Dashboard = () => {
         <div className="content-area">
           <Routes>
             <Route path="/" element={<DashboardOverview users={users} leads={leads} deals={deals} />} />
-            <Route path="/users" element={<UserManagement users={users} setUsers={setUsers} />} />
+            <Route path="/users" element={<UserManagement users={users} setUsers={setUsers} leads={leads} setLeads={handleSetLeads} tasks={tasks} setTasks={setTasks} />} />
             <Route path="/roles" element={<RolesPermissions />} />
             <Route path="/leads" element={<LeadsManagement leads={leads} setLeads={handleSetLeads} users={users} />} />
-            <Route path="/contacts" element={<ContactManagement contacts={contacts} setContacts={setContacts} />} />
+            <Route path="/contacts" element={<ContactManagement contacts={contacts} setContacts={setContacts} leads={leads} setLeads={handleSetLeads} />} />
             <Route path="/deals" element={<DealsManagement deals={deals} setDeals={setDeals} contacts={contacts} />} />
             <Route path="/tasks" element={<TaskManagement tasks={tasks} setTasks={setTasks} users={users} />} />
-            <Route path="/reports" element={<ReportAnalysis leads={leads} deals={deals} />} />
+            <Route path="/reports" element={<ReportAnalysis users={users} leads={leads} deals={deals} />} />
             <Route path="/settings" element={<AppSettings />} />
           </Routes>
         </div>

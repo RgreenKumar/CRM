@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const ContactManagement = ({ contacts, setContacts }) => {
+const ContactManagement = ({ contacts, setContacts, leads, setLeads }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -36,17 +36,49 @@ const ContactManagement = ({ contacts, setContacts }) => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleSaveContact = () => {
+  const handleSaveContact = async () => {
+    const token = localStorage.getItem('token');
+    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+
     if (modalType === 'add') {
-      setContacts([...contacts, { ...currentContact, id: Date.now() }]);
+      try {
+        const res = await fetch('/api/contacts', { method: 'POST', headers, body: JSON.stringify(currentContact) });
+        if (res.ok) {
+          const newContact = await res.json();
+          setContacts([...contacts, newContact]);
+        }
+      } catch (err) { console.error(err); }
     } else {
-      setContacts(contacts.map(c => c.id === currentContact.id ? currentContact : c));
+      try {
+        const oldContact = contacts.find(c => c.id === currentContact.id);
+        const oldEmail = oldContact ? oldContact.email : null;
+        
+        const res = await fetch(`/api/contacts/${currentContact.id}`, { method: 'PUT', headers, body: JSON.stringify(currentContact) });
+        if (res.ok) {
+          const updatedContact = await res.json();
+          setContacts(contacts.map(c => c.id === currentContact.id ? updatedContact : c));
+          
+          if (oldEmail && leads && setLeads) {
+             setLeads(leads.map(lead => 
+                lead.email === oldEmail 
+                   ? { ...lead, name: updatedContact.name, email: updatedContact.email, phone: updatedContact.phone } 
+                   : lead
+             ));
+          }
+        }
+      } catch (err) { console.error(err); }
     }
     setIsModalOpen(false);
   };
 
-  const confirmDelete = () => {
-    setContacts(contacts.filter(c => c.id !== contactToDelete.id));
+  const confirmDelete = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`/api/contacts/${contactToDelete.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+      if (res.ok) {
+        setContacts(contacts.filter(c => c.id !== contactToDelete.id));
+      }
+    } catch (err) { console.error(err); }
     setIsDeleteModalOpen(false);
   };
 

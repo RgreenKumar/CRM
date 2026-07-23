@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const UserManagement = ({ users, setUsers }) => {
+const UserManagement = ({ users, setUsers, leads, setLeads, tasks, setTasks }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [modalState, setModalState] = useState({ type: null, user: null }); // type can be 'add', 'edit', 'delete'
 
@@ -10,36 +10,95 @@ const UserManagement = ({ users, setUsers }) => {
   const openModal = (type, user = null) => {
     setModalState({ type, user });
     if (user) {
-      setFormData({ name: user.name, email: user.email, role: user.role, status: user.status, manager: user.manager || '' });
+      setFormData({ name: user.name, email: user.email, role: formatRole(user.role), status: user.status, manager: user.manager || '' });
     } else {
-      setFormData({ name: '', email: '', role: 'Sales User', status: 'Active', manager: '' });
+      setFormData({ name: '', email: '', role: 'Sales Person', status: 'Active', manager: '' });
     }
   };
 
   const closeModal = () => setModalState({ type: null, user: null });
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    const token = localStorage.getItem('token');
+    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+
+    const payload = { ...formData };
+    if (payload.role === 'Admin') payload.role = 'ROLE_ADMIN';
+    if (payload.role === 'Manager') payload.role = 'ROLE_MANAGER';
+    if (payload.role === 'Sales Person') payload.role = 'ROLE_SALES';
+
     if (modalState.type === 'add') {
-      const newUser = { ...formData, id: Date.now() };
-      setUsers([...users, newUser]);
+      try {
+        const res = await fetch('/api/users', { method: 'POST', headers, body: JSON.stringify(payload) });
+        if (res.ok) {
+          const newUser = await res.json();
+          setUsers([...users, newUser]);
+        }
+      } catch (err) { console.error(err); }
     } else if (modalState.type === 'edit') {
-      setUsers(users.map(u => u.id === modalState.user.id ? { ...u, ...formData } : u));
+      try {
+        const oldName = modalState.user.name;
+        const res = await fetch(`/api/users/${modalState.user.id}`, { method: 'PUT', headers, body: JSON.stringify(payload) });
+        if (res.ok) {
+          const updatedUser = await res.json();
+          setUsers(users.map(u => u.id === modalState.user.id ? updatedUser : u));
+          
+          if (oldName !== updatedUser.name) {
+             if (leads && setLeads) {
+                 setLeads(leads.map(l => l.assignedTo === oldName ? { ...l, assignedTo: updatedUser.name } : l));
+             }
+             if (tasks && setTasks) {
+                 setTasks(tasks.map(t => t.assignedTo === oldName ? { ...t, assignedTo: updatedUser.name } : t));
+             }
+          }
+        }
+      } catch (err) { console.error(err); }
     }
     closeModal();
   };
 
-  const handleDelete = () => {
-    setUsers(users.filter(u => u.id !== modalState.user.id));
+  const handleDelete = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const oldName = modalState.user.name;
+      const res = await fetch(`/api/users/${modalState.user.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+      if (res.ok) {
+        setUsers(users.filter(u => u.id !== modalState.user.id));
+        if (leads && setLeads) {
+             setLeads(leads.map(l => l.assignedTo === oldName ? { ...l, assignedTo: 'Unassigned' } : l));
+        }
+        if (tasks && setTasks) {
+             setTasks(tasks.map(t => t.assignedTo === oldName ? { ...t, assignedTo: 'Unassigned' } : t));
+        }
+      }
+    } catch (err) { console.error(err); }
     closeModal();
   };
 
   const filteredUsers = users.filter(u => {
     const q = searchQuery.toLowerCase();
-    return u.name.toLowerCase().includes(q) || 
-           u.email.toLowerCase().includes(q) || 
-           u.role.toLowerCase().includes(q) || 
-           u.status.toLowerCase().includes(q);
+    return (u.name || '').toLowerCase().includes(q) || 
+           (u.email || '').toLowerCase().includes(q) || 
+           (u.role || '').toLowerCase().includes(q) || 
+           (u.status || '').toLowerCase().includes(q);
   });
+
+  const formatRole = (roleStr) => {
+    if (!roleStr) return '';
+    const normalized = roleStr.toUpperCase();
+    if (normalized.includes('ADMIN')) return 'Admin';
+    if (normalized.includes('MANAGER')) return 'Manager';
+    if (normalized.includes('SALES')) return 'Sales Person';
+    
+    // Default fallback to Manager or whatever if it's something else like Support/Marketing
+    return 'Sales Person';
+  };
+
+  const getRoleStyle = (role) => {
+    if (role === 'Admin') return { backgroundColor: '#fef2f2', color: '#991b1b', padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', display: 'inline-block' };
+    if (role === 'Manager') return { backgroundColor: '#eff6ff', color: '#1e40af', padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', display: 'inline-block' };
+    return { backgroundColor: '#ecfdf5', color: '#065f46', padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', display: 'inline-block' };
+  };
 
   return (
     <div className="dashboard-panel">
@@ -66,6 +125,7 @@ const UserManagement = ({ users, setUsers }) => {
             <th>Name</th>
             <th>Email</th>
             <th>Role</th>
+            <th>Manager</th>
             <th>Status</th>
             <th style={{ textAlign: 'right' }}>Actions</th>
           </tr>
@@ -75,7 +135,14 @@ const UserManagement = ({ users, setUsers }) => {
             <tr key={user.id}>
               <td><div className="lead-name">{user.name}</div></td>
               <td><div className="lead-email">{user.email}</div></td>
-              <td>{user.role}</td>
+              <td>
+                <span style={getRoleStyle(formatRole(user.role))}>
+                  {formatRole(user.role)}
+                </span>
+              </td>
+              <td style={{ fontWeight: '500', color: user.manager ? '#374151' : '#9ca3af' }}>
+                {user.manager ? `👤 ${user.manager}` : '-'}
+              </td>
               <td>
                 <span className={`status-badge ${user.status === 'Active' ? 'status-qualified' : 'status-inactive'}`}>
                   {user.status}
@@ -113,16 +180,16 @@ const UserManagement = ({ users, setUsers }) => {
               <label className="form-label">Role *</label>
               <select className="form-select" value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })}>
                 <option value="Admin">Admin</option>
-                <option value="Sales Manager">Sales Manager</option>
-                <option value="Sales User">Sales User</option>
+                <option value="Manager">Manager</option>
+                <option value="Sales Person">Sales Person</option>
               </select>
             </div>
-            {formData.role === 'Sales User' && (
+            {formData.role === 'Sales Person' && (
               <div className="form-group">
                 <label className="form-label">select Manager</label>
                 <select className="form-select" value={formData.manager} onChange={e => setFormData({ ...formData, manager: e.target.value })}>
                   <option value="">Select a Manager</option>
-                  {users.filter(u => u.role === 'Sales Manager').map(m => (
+                  {users.filter(u => (u.role || '').toUpperCase().includes('MANAGER')).map(m => (
                     <option key={m.id} value={m.name}>{m.name}</option>
                   ))}
                 </select>

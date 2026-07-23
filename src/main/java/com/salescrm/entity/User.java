@@ -21,6 +21,12 @@ public class User {
     @Column(nullable = false)
     private String role; // e.g. ROLE_USER
 
+    @Column
+    private String status = "Active";
+
+    @Column
+    private String manager;
+
     @Column(length = 10)
     private String otp;
 
@@ -50,6 +56,12 @@ public class User {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public String getManager() { return manager; }
+    public void setManager(String manager) { this.manager = manager; }
 
     public String getOtp() { return otp; }
     public void setOtp(String otp) { this.otp = otp; }
