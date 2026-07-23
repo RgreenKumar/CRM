@@ -117,15 +117,17 @@ const UserManagement = ({ users, setUsers }) => {
                 <option value="Sales User">Sales User</option>
               </select>
             </div>
-            <div className="form-group">
-              <label className="form-label">select Manager</label>
-              <select className="form-select" value={formData.manager} onChange={e => setFormData({ ...formData, manager: e.target.value })}>
-                <option value="">Select a Manager</option>
-                {users.filter(u => u.role === 'Sales Manager').map(m => (
-                  <option key={m.id} value={m.name}>{m.name}</option>
-                ))}
-              </select>
-            </div>
+            {formData.role === 'Sales User' && (
+              <div className="form-group">
+                <label className="form-label">select Manager</label>
+                <select className="form-select" value={formData.manager} onChange={e => setFormData({ ...formData, manager: e.target.value })}>
+                  <option value="">Select a Manager</option>
+                  {users.filter(u => u.role === 'Sales Manager').map(m => (
+                    <option key={m.id} value={m.name}>{m.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div className="form-group">
               <label className="form-label">Status *</label>
               <select className="form-select" value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })}>

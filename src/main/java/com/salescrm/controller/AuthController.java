@@ -52,7 +52,7 @@ public class AuthController {
                 response.put("token", token);
                 
                 if (user != null) {
-                    response.put("user", Map.of("email", user.getEmail(), "role", user.getRole()));
+                    response.put("user", Map.of("email", user.getEmail(), "role", user.getRole(), "name", user.getName() != null ? user.getName() : ""));
                 }
                 
                 return ResponseEntity.ok(response);
@@ -68,12 +68,13 @@ public class AuthController {
     public ResponseEntity<?> signup(@RequestBody Map<String, String> userDetails) {
         String email = userDetails.get("email");
         String password = userDetails.get("password");
+        String name = userDetails.get("name");
 
         if (userRepository.existsByEmail(email)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Email is already registered"));
         }
 
-        User newUser = new User(email, passwordEncoder.encode(password), "ROLE_USER");
+        User newUser = new User(email, passwordEncoder.encode(password), "ROLE_USER", name);
         userRepository.save(newUser);
 
         return ResponseEntity.ok(Map.of("message", "User registered successfully."));
@@ -158,6 +159,6 @@ public class AuthController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "User not found"));
         }
-        return ResponseEntity.ok(Map.of("email", user.getEmail(), "role", user.getRole()));
+        return ResponseEntity.ok(Map.of("email", user.getEmail(), "role", user.getRole(), "name", user.getName() != null ? user.getName() : ""));
     }
 }

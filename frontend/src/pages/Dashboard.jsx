@@ -82,6 +82,12 @@ const Dashboard = () => {
 
   const currentNavItem = navItems.find(item => location.pathname === item.path) || navItems[0];
 
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  const displayName = user?.name || 'Admin User';
+  const displayRole = user?.role === 'ROLE_USER' ? 'User' : 'Administrator';
+  const avatarLetter = displayName.charAt(0).toUpperCase();
+
   return (
     <div className="dashboard-layout">
       <aside className="sidebar">
@@ -119,10 +125,10 @@ const Dashboard = () => {
         <header className="topbar">
           <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-primary)' }}>{currentNavItem.label}</h2>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#3b82f6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600' }}>A</div>
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#3b82f6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600' }}>{avatarLetter}</div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>Admin User</span>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Administrator</span>
+              <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>{displayName}</span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{displayRole}</span>
             </div>
           </div>
         </header>

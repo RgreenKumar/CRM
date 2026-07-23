@@ -80,7 +80,7 @@ export const LoginPage = () => {
         
         // [ Fetch User Profile / Permissions ]
         try {
-          const profileRes = await fetch('/api/user/profile', {
+          const profileRes = await fetch('/api/auth/profile', {
             headers: { 'Authorization': `Bearer ${data.token}` }
           });
           if (profileRes.ok) {
@@ -168,6 +168,7 @@ export const LoginPage = () => {
 
 export const SignupPage = () => {
   const navigate = useNavigate();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -188,7 +189,7 @@ export const SignupPage = () => {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ name, email, password })
       });
       
       const data = await response.json();
@@ -224,6 +225,18 @@ export const SignupPage = () => {
         {error && <div className="auth-error">{error}</div>}
         
         <form onSubmit={handleSignup} className="auth-form">
+          <div className="auth-form-group">
+            <label>Full Name</label>
+            <input 
+              type="text" 
+              required 
+              className="auth-input" 
+              value={name} 
+              onChange={(e) => setName(e.target.value)} 
+              placeholder="John Doe" 
+            />
+          </div>
+          
           <div className="auth-form-group">
             <label>Email</label>
             <input 
