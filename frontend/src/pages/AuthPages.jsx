@@ -464,6 +464,8 @@ export const CreatePasswordPage = () => {
   const otp = location.state?.otp || sessionStorage.getItem('resetOtp');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
