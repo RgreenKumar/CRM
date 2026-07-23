@@ -5,14 +5,14 @@ const UserManagement = ({ users, setUsers }) => {
   const [modalState, setModalState] = useState({ type: null, user: null }); // type can be 'add', 'edit', 'delete'
 
   // Form state
-  const [formData, setFormData] = useState({ name: '', email: '', role: 'Sales User', status: 'Active' });
+  const [formData, setFormData] = useState({ name: '', email: '', role: 'Sales User', status: 'Active', manager: '' });
 
   const openModal = (type, user = null) => {
     setModalState({ type, user });
     if (user) {
-      setFormData({ name: user.name, email: user.email, role: user.role, status: user.status });
+      setFormData({ name: user.name, email: user.email, role: user.role, status: user.status, manager: user.manager || '' });
     } else {
-      setFormData({ name: '', email: '', role: 'Sales User', status: 'Active' });
+      setFormData({ name: '', email: '', role: 'Sales User', status: 'Active', manager: '' });
     }
   };
 
@@ -115,6 +115,15 @@ const UserManagement = ({ users, setUsers }) => {
                 <option value="Admin">Admin</option>
                 <option value="Sales Manager">Sales Manager</option>
                 <option value="Sales User">Sales User</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">select Manager</label>
+              <select className="form-select" value={formData.manager} onChange={e => setFormData({ ...formData, manager: e.target.value })}>
+                <option value="">Select a Manager</option>
+                {users.filter(u => u.role === 'Sales Manager').map(m => (
+                  <option key={m.id} value={m.name}>{m.name}</option>
+                ))}
               </select>
             </div>
             <div className="form-group">
