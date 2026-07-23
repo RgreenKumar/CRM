@@ -136,6 +136,9 @@ public class AuthController {
         }
         
         if (user != null) {
+            if (passwordEncoder.matches(newPassword, user.getPassword())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "New password cannot be the same as the previous password."));
+            }
             user.setPassword(passwordEncoder.encode(newPassword));
             user.setOtp(null);
             user.setOtpExpiry(null);

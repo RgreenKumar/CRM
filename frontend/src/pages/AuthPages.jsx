@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 
 const FigmaLogoSVG = () => (
   <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -30,6 +31,7 @@ export const LoginPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   
   // States for errors as requested in flowchart
   const [emailError, setEmailError] = useState('');
@@ -128,18 +130,23 @@ export const LoginPage = () => {
           
           <div className="auth-form-group">
             <label>Password</label>
-            <input 
-              type="password" 
-              className={`auth-input ${passwordError ? 'auth-input-error' : ''}`}
-              value={password} 
-              onChange={(e) => { setPassword(e.target.value); setPasswordError(''); }} 
-              placeholder="••••••••" 
-            />
+            <div className="password-input-wrapper">
+              <input 
+                type={showPassword ? "text" : "password"} 
+                className={`auth-input ${passwordError ? 'auth-input-error' : ''}`}
+                value={password} 
+                onChange={(e) => { setPassword(e.target.value); setPasswordError(''); }} 
+                placeholder="••••••••" 
+              />
+              <div className="password-toggle-icon" onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </div>
+            </div>
             {passwordError && <span style={{ color: 'var(--error-color)', fontSize: '0.875rem', marginTop: '0.25rem' }}>{passwordError}</span>}
           </div>
           
           <div className="auth-form-options">
-            <label className="remember-me">
+            <label className="checkbox-container">
               <input type="checkbox" />
               <span>Remember me</span>
             </label>
@@ -164,6 +171,8 @@ export const SignupPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
 
   const handleSignup = async (e) => {
@@ -229,26 +238,36 @@ export const SignupPage = () => {
           
           <div className="auth-form-group">
             <label>Password</label>
-            <input 
-              type="password" 
-              required 
-              className="auth-input" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              placeholder="••••••••" 
-            />
+            <div className="password-input-wrapper">
+              <input 
+                type={showPassword ? "text" : "password"} 
+                required 
+                className="auth-input" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                placeholder="••••••••" 
+              />
+              <div className="password-toggle-icon" onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </div>
+            </div>
           </div>
 
           <div className="auth-form-group">
             <label>Confirm Password</label>
-            <input 
-              type="password" 
-              required 
-              className="auth-input" 
-              value={confirmPassword} 
-              onChange={(e) => setConfirmPassword(e.target.value)} 
-              placeholder="••••••••" 
-            />
+            <div className="password-input-wrapper">
+              <input 
+                type={showConfirmPassword ? "text" : "password"} 
+                required 
+                className="auth-input" 
+                value={confirmPassword} 
+                onChange={(e) => setConfirmPassword(e.target.value)} 
+                placeholder="••••••••" 
+              />
+              <div className="password-toggle-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </div>
+            </div>
           </div>
 
           <button type="submit" className="auth-btn">
@@ -360,15 +379,6 @@ export const OtpPage = () => {
       return;
     }
     
-    // Hardcoded bypass for testing
-    if (enteredOtp === '0000') {
-      const fallbackEmail = email || 'admin@salescrm.com';
-      sessionStorage.setItem('resetOtp', '0000');
-      sessionStorage.setItem('resetEmail', fallbackEmail);
-      navigate('/create-password', { state: { email: fallbackEmail, otp: '0000' } });
-      return;
-    }
-
     if (!email) {
       setError("Session expired. Please start over.");
       return;
@@ -513,23 +523,33 @@ export const CreatePasswordPage = () => {
         <form onSubmit={handleCreate} className="auth-form">
           <div className="auth-form-group">
             <label>Password</label>
-            <input 
-              type="password" 
-              required 
-              className="auth-input" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-            />
+            <div className="password-input-wrapper">
+              <input 
+                type={showPassword ? "text" : "password"} 
+                required 
+                className="auth-input" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+              />
+              <div className="password-toggle-icon" onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </div>
+            </div>
           </div>
           <div className="auth-form-group">
             <label>Retype your Password</label>
-            <input 
-              type="password" 
-              required 
-              className="auth-input" 
-              value={confirmPassword} 
-              onChange={(e) => setConfirmPassword(e.target.value)} 
-            />
+            <div className="password-input-wrapper">
+              <input 
+                type={showConfirmPassword ? "text" : "password"} 
+                required 
+                className="auth-input" 
+                value={confirmPassword} 
+                onChange={(e) => setConfirmPassword(e.target.value)} 
+              />
+              <div className="password-toggle-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </div>
+            </div>
           </div>
           <button type="submit" className="auth-btn" disabled={loading}>
             {loading ? 'Resetting...' : 'Go to Login'}
