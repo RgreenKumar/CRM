@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
+
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -24,12 +24,12 @@ public class TaskController {
     }
 
     @PostMapping
-    public Task createTask(@RequestBody @NonNull Task task) {
+    public Task createTask(@RequestBody Task task) {
         return taskRepository.save(task);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable @NonNull Long id, @RequestBody @NonNull Task taskDetails) {
+    public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task taskDetails) {
         Optional<Task> optionalTask = taskRepository.findById(id);
         if (optionalTask.isPresent()) {
             Task task = optionalTask.get();
@@ -44,7 +44,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTask(@PathVariable @NonNull Long id) {
+    public ResponseEntity<?> deleteTask(@PathVariable Long id) {
         if (taskRepository.existsById(id)) {
             taskRepository.deleteById(id);
             return ResponseEntity.ok().build();

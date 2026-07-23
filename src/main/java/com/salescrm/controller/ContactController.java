@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
+
 import com.salescrm.repository.LeadRepository;
 import com.salescrm.entity.Lead;
 
@@ -29,12 +29,12 @@ public class ContactController {
     }
 
     @PostMapping
-    public Contact createContact(@RequestBody @NonNull Contact contact) {
+    public Contact createContact(@RequestBody Contact contact) {
         return contactRepository.save(contact);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Contact> updateContact(@PathVariable @NonNull Long id, @RequestBody @NonNull Contact contactDetails) {
+    public ResponseEntity<Contact> updateContact(@PathVariable Long id, @RequestBody Contact contactDetails) {
         Optional<Contact> optionalContact = contactRepository.findById(id);
         if (optionalContact.isPresent()) {
             Contact contact = optionalContact.get();
@@ -64,7 +64,7 @@ public class ContactController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteContact(@PathVariable @NonNull Long id) {
+    public ResponseEntity<?> deleteContact(@PathVariable Long id) {
         if (contactRepository.existsById(id)) {
             contactRepository.deleteById(id);
             return ResponseEntity.ok().build();
