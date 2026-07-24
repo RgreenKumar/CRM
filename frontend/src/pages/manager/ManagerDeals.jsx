@@ -125,7 +125,7 @@ const ManagerDeals = () => {
                   <td>{deal.value}</td>
                   <td><StatusBadge status={deal.stage} /></td>
                   <td>{deal.assignedTo || 'Unassigned'}</td>
-                  <td>{deal.expectedCloseDate || '-'}</td>
+                  <td>{deal.closeDate || '-'}</td>
                 </tr>
               ))}
               {filteredDeals.length === 0 && (

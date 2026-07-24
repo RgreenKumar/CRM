@@ -128,17 +128,17 @@ const ManagerReports = () => {
 
           const allMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
           
-          // Get last 6 months
+          // Get last 12 months
           const currentMonthIdx = new Date().getMonth();
-          const last6Months = [];
-          for (let i = 5; i >= 0; i--) {
+          const last12Months = [];
+          for (let i = 11; i >= 0; i--) {
             let mIdx = currentMonthIdx - i;
             if (mIdx < 0) mIdx += 12;
-            last6Months.push(allMonths[mIdx]);
+            last12Months.push(allMonths[mIdx]);
           }
 
           const monthlyCounts = {};
-          last6Months.forEach(m => monthlyCounts[m] = 0);
+          last12Months.forEach(m => monthlyCounts[m] = 0);
 
           managerDeals.forEach(deal => {
             if (deal.closeDate) {
@@ -152,7 +152,7 @@ const ManagerReports = () => {
             }
           });
 
-          const monthlyData = last6Months.map(month => ({
+          const monthlyData = last12Months.map(month => ({
             month,
             deals: monthlyCounts[month]
           }));
@@ -223,7 +223,9 @@ const ManagerReports = () => {
         <div style={{ marginTop: '1.5rem', paddingBottom: '1rem', height: '300px' }}>
           <MonthlyDealsChart data={stats.monthlyData.length > 0 ? stats.monthlyData : [
             { month: 'Jan', deals: 0 }, { month: 'Feb', deals: 0 }, { month: 'Mar', deals: 0 },
-            { month: 'Apr', deals: 0 }, { month: 'May', deals: 0 }, { month: 'Jun', deals: 0 }
+            { month: 'Apr', deals: 0 }, { month: 'May', deals: 0 }, { month: 'Jun', deals: 0 },
+            { month: 'Jul', deals: 0 }, { month: 'Aug', deals: 0 }, { month: 'Sep', deals: 0 },
+            { month: 'Oct', deals: 0 }, { month: 'Nov', deals: 0 }, { month: 'Dec', deals: 0 }
           ]} />
         </div>
       </div>
