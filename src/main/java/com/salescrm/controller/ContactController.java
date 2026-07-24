@@ -39,14 +39,14 @@ public class ContactController {
         if (optionalContact.isPresent()) {
             Contact contact = optionalContact.get();
             String oldEmail = contact.getEmail();
-            
+
             contact.setName(contactDetails.getName());
             contact.setEmail(contactDetails.getEmail());
             contact.setPhone(contactDetails.getPhone());
             contact.setCompany(contactDetails.getCompany());
             contact.setDesignation(contactDetails.getDesignation());
             Contact updatedContact = contactRepository.save(contact);
-            
+
             // Also update the linked Lead if they share the same email
             if (oldEmail != null && !oldEmail.isEmpty()) {
                 List<Lead> linkedLeads = leadRepository.findByEmail(oldEmail);
@@ -57,7 +57,7 @@ public class ContactController {
                     leadRepository.save(lead);
                 }
             }
-            
+
             return ResponseEntity.ok(updatedContact);
         }
         return ResponseEntity.notFound().build();

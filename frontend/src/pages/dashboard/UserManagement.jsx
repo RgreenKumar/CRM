@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { Search, Plus, Edit2, Trash2, Shield, UserCircle, Briefcase, Mail, CheckCircle2, XCircle, X, AlertTriangle } from 'lucide-react';
+import './UserManagement.css';
 
 const UserManagement = ({ users, setUsers, leads, setLeads, tasks, setTasks }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [modalState, setModalState] = useState({ type: null, user: null }); // type can be 'add', 'edit', 'delete'
 
   // Form state
-  const [formData, setFormData] = useState({ name: '', email: '', role: 'Sales User', status: 'Active', manager: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', role: 'Sales Person', status: 'Active', manager: '' });
 
   const openModal = (type, user = null) => {
     setModalState({ type, user });
@@ -89,105 +91,131 @@ const UserManagement = ({ users, setUsers, leads, setLeads, tasks, setTasks }) =
     if (normalized.includes('ADMIN')) return 'Admin';
     if (normalized.includes('MANAGER')) return 'Manager';
     if (normalized.includes('SALES')) return 'Sales Person';
-    
-    // Default fallback to Manager or whatever if it's something else like Support/Marketing
     return 'Sales Person';
   };
 
-  const getRoleStyle = (role) => {
-    if (role === 'Admin') return { backgroundColor: '#fef2f2', color: '#991b1b', padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', display: 'inline-block' };
-    if (role === 'Manager') return { backgroundColor: '#eff6ff', color: '#1e40af', padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', display: 'inline-block' };
-    return { backgroundColor: '#ecfdf5', color: '#065f46', padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', display: 'inline-block' };
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  };
+
+  const getRoleBadge = (role) => {
+    if (role === 'Admin') return <span className="um-badge um-badge-admin"><Shield size={14} /> Admin</span>;
+    if (role === 'Manager') return <span className="um-badge um-badge-manager"><Briefcase size={14} /> Manager</span>;
+    return <span className="um-badge um-badge-sales"><UserCircle size={14} /> Sales Person</span>;
   };
 
   return (
-    <div className="dashboard-panel">
-      <div className="users-header">
-        <div className="users-header-info">
-          <h2>Users</h2>
-          <p>Manage user accounts and access</p>
+    <div className="um-container">
+      <div className="um-header-card">
+        <div className="um-title-section">
+          <h2>Team Members</h2>
+          <p>Manage access, roles, and collaborate efficiently.</p>
         </div>
-        <div className="users-actions">
-          <input
-            type="text"
-            className="search-input"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <button className="btn btn-primary" onClick={() => openModal('add')}>+ Add User</button>
+        <div className="um-actions">
+          <div className="um-search-wrapper">
+            <Search className="um-search-icon" size={18} />
+            <input
+              type="text"
+              className="um-search-input"
+              placeholder="Search users..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <button className="um-btn-primary" onClick={() => openModal('add')}>
+            <Plus size={18} /> Add User
+          </button>
         </div>
       </div>
 
-      <table className="leads-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Manager</th>
-            <th>Status</th>
-            <th style={{ textAlign: 'right' }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredUsers.map(user => (
-            <tr key={user.id}>
-              <td><div className="lead-name">{user.name}</div></td>
-              <td><div className="lead-email">{user.email}</div></td>
-              <td>
-                <span style={getRoleStyle(formatRole(user.role))}>
-                  {formatRole(user.role)}
-                </span>
-              </td>
-              <td style={{ fontWeight: '500', color: user.manager ? '#374151' : '#9ca3af' }}>
-                {user.manager ? `👤 ${user.manager}` : '-'}
-              </td>
-              <td>
-                <span className={`status-badge ${user.status === 'Active' ? 'status-qualified' : 'status-inactive'}`}>
-                  {user.status}
-                </span>
-              </td>
-              <td style={{ textAlign: 'right' }}>
-                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                  <button className="btn btn-outline" style={{ padding: '0.3rem 0.75rem', fontSize: '0.75rem' }} onClick={() => openModal('edit', user)}>Edit</button>
-                  <button className="btn btn-danger" style={{ padding: '0.3rem 0.75rem', fontSize: '0.75rem' }} onClick={() => openModal('delete', user)}>Delete</button>
-                </div>
-              </td>
+      <div className="um-table-container">
+        <table className="um-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Role</th>
+              <th>Manager</th>
+              <th>Status</th>
+              <th style={{ textAlign: 'right' }}>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredUsers.map(user => (
+              <tr key={user.id}>
+                <td>
+                  <div className="um-user-cell">
+                    <div className="um-avatar">{getInitials(user.name)}</div>
+                    <div className="um-user-info">
+                      <h4>{user.name}</h4>
+                      <p>{user.email}</p>
+                    </div>
+                  </div>
+                </td>
+                <td>{getRoleBadge(formatRole(user.role))}</td>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: user.manager ? '#475569' : '#cbd5e1' }}>
+                    {user.manager ? <UserCircle size={16} /> : null}
+                    <span style={{ fontWeight: '500' }}>{user.manager || '—'}</span>
+                  </div>
+                </td>
+                <td>
+                  <span className={`um-status ${user.status === 'Active' ? 'um-status-active' : 'um-status-inactive'}`}>
+                    {user.status}
+                  </span>
+                </td>
+                <td>
+                  <div className="um-actions-cell">
+                    <button className="um-action-btn" title="Edit User" onClick={() => openModal('edit', user)}>
+                      <Edit2 size={18} />
+                    </button>
+                    <button className="um-action-btn delete" title="Delete User" onClick={() => openModal('delete', user)}>
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {filteredUsers.length === 0 && (
+               <tr>
+                 <td colSpan="5" style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8' }}>
+                   No users found matching "{searchQuery}"
+                 </td>
+               </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* Add / Edit Modal */}
       {(modalState.type === 'add' || modalState.type === 'edit') && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>{modalState.type === 'add' ? 'Add User' : 'Edit User'}</h3>
-              <button className="modal-close" onClick={closeModal}>✕</button>
+        <div className="um-modal-overlay">
+          <div className="um-modal-content">
+            <div className="um-modal-header">
+              <h3>{modalState.type === 'add' ? 'Create New User' : 'Edit User Profile'}</h3>
+              <button className="um-close-btn" onClick={closeModal}><X size={20} /></button>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Full Name *</label>
-              <input type="text" className="form-input" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="John Doe" />
+            <div className="um-form-group">
+              <label className="um-form-label">Full Name</label>
+              <input type="text" className="um-form-input" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. Jane Doe" />
             </div>
-            <div className="form-group">
-              <label className="form-label">Email *</label>
-              <input type="email" className="form-input" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} placeholder="john.doe@example.com" />
+            <div className="um-form-group">
+              <label className="um-form-label">Email Address</label>
+              <input type="email" className="um-form-input" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} placeholder="jane@example.com" />
             </div>
-            <div className="form-group">
-              <label className="form-label">Role *</label>
-              <select className="form-select" value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })}>
-                <option value="Admin">Admin</option>
+            <div className="um-form-group">
+              <label className="um-form-label">Role</label>
+              <select className="um-form-select" value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })}>
+                <option value="Admin">Administrator</option>
                 <option value="Manager">Manager</option>
-                <option value="Sales Person">Sales Person</option>
+                <option value="Sales Person">Sales Representative</option>
               </select>
             </div>
             {formData.role === 'Sales Person' && (
-              <div className="form-group">
-                <label className="form-label">select Manager</label>
-                <select className="form-select" value={formData.manager} onChange={e => setFormData({ ...formData, manager: e.target.value })}>
+              <div className="um-form-group">
+                <label className="um-form-label">Assign Manager</label>
+                <select className="um-form-select" value={formData.manager} onChange={e => setFormData({ ...formData, manager: e.target.value })}>
                   <option value="">Select a Manager</option>
                   {users.filter(u => (u.role || '').toUpperCase().includes('MANAGER')).map(m => (
                     <option key={m.id} value={m.name}>{m.name}</option>
@@ -195,17 +223,19 @@ const UserManagement = ({ users, setUsers, leads, setLeads, tasks, setTasks }) =
                 </select>
               </div>
             )}
-            <div className="form-group">
-              <label className="form-label">Status *</label>
-              <select className="form-select" value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })}>
+            <div className="um-form-group">
+              <label className="um-form-label">Account Status</label>
+              <select className="um-form-select" value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })}>
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
             </div>
 
-            <div className="modal-footer">
-              <button className="btn btn-outline" onClick={closeModal}>Cancel</button>
-              <button className="btn btn-primary" onClick={handleSave}>{modalState.type === 'add' ? 'Save' : 'Update'}</button>
+            <div className="um-modal-footer">
+              <button className="um-btn-outline" onClick={closeModal}>Cancel</button>
+              <button className="um-btn-save" onClick={handleSave}>
+                {modalState.type === 'add' ? 'Create User' : 'Save Changes'}
+              </button>
             </div>
           </div>
         </div>
@@ -213,20 +243,20 @@ const UserManagement = ({ users, setUsers, leads, setLeads, tasks, setTasks }) =
 
       {/* Delete Confirmation Modal */}
       {modalState.type === 'delete' && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ width: '400px' }}>
-            <div className="modal-header" style={{ marginBottom: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <div style={{ backgroundColor: '#fef08a', color: '#854d0e', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>!</div>
-                <h3>Delete User</h3>
+        <div className="um-modal-overlay">
+          <div className="um-modal-content" style={{ width: '400px' }}>
+            <div className="um-modal-header" style={{ marginBottom: '1rem', borderBottom: 'none' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#ef4444' }}>
+                <AlertTriangle size={24} />
+                <h3 style={{ color: '#ef4444' }}>Remove User</h3>
               </div>
             </div>
-            <p style={{ color: '#4b5563', fontSize: '0.9rem', marginBottom: '1rem', paddingLeft: '3rem' }}>
-              Are you sure you want to delete ? This action cannot be undone.
+            <p style={{ color: '#475569', fontSize: '0.95rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+              Are you sure you want to delete <strong>{modalState.user?.name}</strong>? This action cannot be undone and will permanently remove their access.
             </p>
-            <div className="modal-footer">
-              <button className="btn btn-outline" onClick={closeModal}>Cancel</button>
-              <button className="btn btn-danger" onClick={handleDelete}>Delete</button>
+            <div className="um-modal-footer" style={{ marginTop: '0' }}>
+              <button className="um-btn-outline" onClick={closeModal}>Cancel</button>
+              <button className="um-btn-danger" onClick={handleDelete}>Delete User</button>
             </div>
           </div>
         </div>
