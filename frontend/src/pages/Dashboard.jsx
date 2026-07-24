@@ -139,7 +139,7 @@ const Dashboard = () => {
             <Route path="/roles" element={<RolesPermissions />} />
             <Route path="/leads" element={<LeadsManagement leads={leads} setLeads={handleSetLeads} users={users} />} />
             <Route path="/contacts" element={<ContactManagement contacts={contacts} setContacts={setContacts} leads={leads} setLeads={handleSetLeads} />} />
-            <Route path="/deals" element={<DealsManagement deals={deals} setDeals={setDeals} contacts={contacts} />} />
+            <Route path="/deals" element={<DealsManagement deals={deals} setDeals={setDeals} contacts={contacts} users={users} />} />
             <Route path="/tasks" element={<TaskManagement tasks={tasks} setTasks={setTasks} users={users} />} />
             <Route path="/reports" element={<ReportAnalysis users={users} leads={leads} deals={deals} />} />
             <Route path="/settings" element={<AppSettings />} />

@@ -15,6 +15,8 @@ public class Deal {
     private String stage;
     private String status;
     private String closeDate;
+    
+    private String assignedTo;
 
     public Deal() {}
 
@@ -38,4 +40,7 @@ public class Deal {
 
     public String getCloseDate() { return closeDate; }
     public void setCloseDate(String closeDate) { this.closeDate = closeDate; }
+
+    public String getAssignedTo() { return assignedTo; }
+    public void setAssignedTo(String assignedTo) { this.assignedTo = assignedTo; }
 }

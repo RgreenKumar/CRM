@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 
-const DealsManagement = ({ deals, setDeals, contacts }) => {
+const DealsManagement = ({ deals, setDeals, contacts, users }) => {
   const { currency, pipelineStages } = useSettings();
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add');
-  const [currentDeal, setCurrentDeal] = useState({ title: '', contact: '', value: '', stage: pipelineStages[0]?.name || 'Proposal', closeDate: '' });
+  const [currentDeal, setCurrentDeal] = useState({ title: '', contact: '', value: '', stage: pipelineStages[0]?.name || 'Proposal', closeDate: '', assignedTo: '' });
   const [editId, setEditId] = useState(null);
 
   const filteredDeals = deals.filter(deal => {
@@ -51,7 +51,7 @@ const DealsManagement = ({ deals, setDeals, contacts }) => {
 
   const handleAddClick = () => {
     setModalType('add');
-    setCurrentDeal({ title: '', contact: '', value: '', stage: pipelineStages[0]?.name || 'Proposal', closeDate: '' });
+    setCurrentDeal({ title: '', contact: '', value: '', stage: pipelineStages[0]?.name || 'Proposal', closeDate: '', assignedTo: '' });
     setIsModalOpen(true);
   };
 
@@ -138,11 +138,11 @@ const DealsManagement = ({ deals, setDeals, contacts }) => {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ backgroundColor: '#f9fafb', color: '#6b7280', fontSize: '11px', fontWeight: '600', textAlign: 'left', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>TITLE</th>
-              <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>CONTACT</th>
-              <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>VALUE</th>
-              <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>STAGE</th>
-              <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>STATUS</th>
+              <th style={{ textAlign: 'left', padding: '16px 24px', fontSize: '12px', fontWeight: '500', color: '#6b7280', borderBottom: '1px solid #f3f4f6' }}>DEAL NAME</th>
+              <th style={{ textAlign: 'left', padding: '16px 24px', fontSize: '12px', fontWeight: '500', color: '#6b7280', borderBottom: '1px solid #f3f4f6' }}>CONTACT</th>
+              <th style={{ textAlign: 'left', padding: '16px 24px', fontSize: '12px', fontWeight: '500', color: '#6b7280', borderBottom: '1px solid #f3f4f6' }}>ASSIGNED TO</th>
+              <th style={{ textAlign: 'left', padding: '16px 24px', fontSize: '12px', fontWeight: '500', color: '#6b7280', borderBottom: '1px solid #f3f4f6' }}>AMOUNT</th>
+              <th style={{ textAlign: 'left', padding: '16px 24px', fontSize: '12px', fontWeight: '500', color: '#6b7280', borderBottom: '1px solid #f3f4f6' }}>STAGE</th>
               <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>CLOSE DATE</th>
               <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb', textAlign: 'center' }}>ACTIONS</th>
             </tr>
@@ -151,8 +151,9 @@ const DealsManagement = ({ deals, setDeals, contacts }) => {
             {filteredDeals.map((deal) => (
               <tr key={deal.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
                 <td style={{ padding: '16px 24px', color: '#1f2937', fontSize: '14px', fontWeight: '600' }}>{deal.title}</td>
-                <td style={{ padding: '16px 24px', color: '#6b7280', fontSize: '14px' }}>{deal.contact}</td>
-                <td style={{ padding: '16px 24px', color: '#1f2937', fontSize: '14px', fontWeight: '600' }}>{currency.symbol}{deal.value}</td>
+                <td style={{ padding: '16px 24px', borderBottom: '1px solid #f3f4f6', color: '#4b5563' }}>{deal.contact}</td>
+                <td style={{ padding: '16px 24px', borderBottom: '1px solid #f3f4f6', color: '#4b5563' }}>{deal.assignedTo || <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>Unassigned</span>}</td>
+                <td style={{ padding: '16px 24px', borderBottom: '1px solid #f3f4f6', color: '#4b5563', fontWeight: '500' }}>{currency.symbol}{deal.value}</td>
                 <td style={{ padding: '16px 24px' }}>
                   <span style={{ 
                     ...getStageStyle(deal.stage),
@@ -216,6 +217,19 @@ const DealsManagement = ({ deals, setDeals, contacts }) => {
                   <option value="">-- Select Contact --</option>
                   {contacts.map(c => (
                     <option key={c.id} value={c.name}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>Assigned To</label>
+                <select 
+                  value={currentDeal.assignedTo} 
+                  onChange={(e) => setCurrentDeal({...currentDeal, assignedTo: e.target.value})}
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', backgroundColor: 'white', boxSizing: 'border-box' }}
+                >
+                  <option value="">-- Select User --</option>
+                  {users && users.map(u => (
+                    <option key={u.id} value={u.name}>{u.name}</option>
                   ))}
                 </select>
               </div>

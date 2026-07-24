@@ -86,12 +86,20 @@ export const LoginPage = () => {
           if (profileRes.ok) {
             const profileData = await profileRes.json();
             localStorage.setItem('user', JSON.stringify(profileData));
+            
+            // [ Navigate / Redirect to Dashboard based on role ]
+            if (profileData.role === 'ROLE_MANAGER') {
+              navigate('/manager');
+            } else {
+              navigate('/dashboard');
+            }
+            return;
           }
         } catch (e) {
           console.error("Failed to fetch profile/permissions", e);
         }
 
-        // [ Navigate / Redirect to Dashboard ]
+        // [ Navigate / Redirect to Dashboard (fallback) ]
         navigate('/dashboard');
       } else {
         // [ Authentication Failed ]
