@@ -8,10 +8,16 @@ import { Download } from 'lucide-react';
 
 const ReportAnalysis = ({ users = [], leads, deals }) => {
   const { currency, pipelineStages, companyName } = useSettings();
-  
-  // Get all users from the system to show everyone in the report
+  const isSalesRole = (roleStr) => {
+    if (!roleStr) return true;
+    const normalized = roleStr.toUpperCase();
+    if (normalized.includes('ADMIN') || normalized.includes('MANAGER')) return false;
+    return true; // Defaults to sales user for everything else
+  };
+
+  // Get all sales users from the system to show in the report
   const salespersons = users.length > 0 
-    ? users.map(u => u.name).filter(Boolean)
+    ? users.filter(u => isSalesRole(u.role)).map(u => u.name).filter(Boolean)
     : [...new Set(leads.map(lead => lead.assignedTo))].filter(Boolean);
 
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);

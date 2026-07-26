@@ -330,10 +330,17 @@ body {
 .sidebar-nav {
   padding: 1rem 0.5rem;
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  display: none; /* WebKit */
 }
 
 .nav-item {
@@ -414,6 +421,12 @@ body {
   flex: 1;
   padding: 1.5rem;
   overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.content-area::-webkit-scrollbar {
+  display: none; /* WebKit */
 }
 
 .page-title {

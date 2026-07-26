@@ -42,8 +42,8 @@ const ManagerOverview = () => {
           );
           const teamMemberNames = teamMembersList.map(u => u.name);
 
-          const managerLeads = leads.filter(l => !l.assignedTo || l.assignedTo === 'Unassigned' || teamMemberNames.includes(l.assignedTo));
-          const managerDeals = deals.filter(d => teamMemberNames.includes(d.assignedTo));
+          const managerLeads = leads.filter(l => !l.assignedTo || l.assignedTo === 'Unassigned' || teamMemberNames.includes(l.assignedTo) || l.assignedTo === managerName);
+          const managerDeals = deals.filter(d => teamMemberNames.includes(d.assignedTo) || d.assignedTo === managerName);
 
           const teamMembers = teamMembersList.length;
           const teamLeads = managerLeads.length;

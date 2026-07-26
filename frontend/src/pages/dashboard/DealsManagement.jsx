@@ -4,19 +4,23 @@ import { useSettings } from '../../context/SettingsContext';
 const DealsManagement = ({ deals, setDeals, contacts, users }) => {
   const { currency, pipelineStages } = useSettings();
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterStage, setFilterStage] = useState('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add');
-  const [currentDeal, setCurrentDeal] = useState({ title: '', contact: '', value: '', stage: pipelineStages[0]?.name || 'Proposal', closeDate: '', assignedTo: '' });
+  const [currentDeal, setCurrentDeal] = useState({ title: '', contact: '', value: '', stage: pipelineStages[0]?.name || 'Proposal', closeDate: '' });
   const [editId, setEditId] = useState(null);
 
   const filteredDeals = deals.filter(deal => {
     const query = searchQuery.toLowerCase();
-    return (
+    const matchesSearch = (
       deal.title.toLowerCase().includes(query) ||
       deal.contact.toLowerCase().includes(query) ||
       deal.stage.toLowerCase().includes(query)
     );
+    const matchesStage = filterStage === 'All' || deal.stage === filterStage;
+
+    return matchesSearch && matchesStage;
   });
 
   const hexToRgba = (hex, opacity) => {
@@ -32,10 +36,10 @@ const DealsManagement = ({ deals, setDeals, contacts, users }) => {
   const getStageStyle = (stageName) => {
     const stageObj = pipelineStages.find(s => s.name === stageName || s.name.toLowerCase().includes(stageName.toLowerCase()));
     if (stageObj && stageObj.color) {
-      return { 
-        backgroundColor: hexToRgba(stageObj.color, 0.15), 
+      return {
+        backgroundColor: hexToRgba(stageObj.color, 0.15),
         color: stageObj.color,
-        border: `1px solid ${hexToRgba(stageObj.color, 0.2)}` 
+        border: `1px solid ${hexToRgba(stageObj.color, 0.2)}`
       };
     }
     // Fallback for hardcoded mock data that might not match DB stages
@@ -51,7 +55,7 @@ const DealsManagement = ({ deals, setDeals, contacts, users }) => {
 
   const handleAddClick = () => {
     setModalType('add');
-    setCurrentDeal({ title: '', contact: '', value: '', stage: pipelineStages[0]?.name || 'Proposal', closeDate: '', assignedTo: '' });
+    setCurrentDeal({ title: '', contact: '', value: '', stage: pipelineStages[0]?.name || 'Proposal', closeDate: '' });
     setIsModalOpen(true);
   };
 
@@ -120,14 +124,25 @@ const DealsManagement = ({ deals, setDeals, contacts, users }) => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid #f3f4f6' }}>
           <h3 style={{ margin: 0, fontSize: '16px', color: '#1f2937', fontWeight: '600' }}>All Deals</h3>
           <div style={{ display: 'flex', gap: '16px' }}>
-            <input 
-              type="text" 
-              placeholder="Search..." 
+            <select
+              value={filterStage}
+              onChange={(e) => setFilterStage(e.target.value)}
+              style={{ padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: '6px', backgroundColor: '#f9fafb', fontSize: '14px', outline: 'none' }}
+            >
+              <option value="All">All Stages</option>
+              {pipelineStages.map(stage => (
+                <option key={stage.id} value={stage.name}>{stage.name}</option>
+              ))}
+            </select>
+
+            <input
+              type="text"
+              placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: '6px', backgroundColor: '#f9fafb', fontSize: '14px', width: '250px', outline: 'none' }}
             />
-            <button 
+            <button
               onClick={handleAddClick}
               style={{ backgroundColor: '#3b82f6', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
@@ -140,7 +155,7 @@ const DealsManagement = ({ deals, setDeals, contacts, users }) => {
             <tr style={{ backgroundColor: '#f9fafb', color: '#6b7280', fontSize: '11px', fontWeight: '600', textAlign: 'left', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               <th style={{ textAlign: 'left', padding: '16px 24px', fontSize: '12px', fontWeight: '500', color: '#6b7280', borderBottom: '1px solid #f3f4f6' }}>DEAL NAME</th>
               <th style={{ textAlign: 'left', padding: '16px 24px', fontSize: '12px', fontWeight: '500', color: '#6b7280', borderBottom: '1px solid #f3f4f6' }}>CONTACT</th>
-              <th style={{ textAlign: 'left', padding: '16px 24px', fontSize: '12px', fontWeight: '500', color: '#6b7280', borderBottom: '1px solid #f3f4f6' }}>ASSIGNED TO</th>
+
               <th style={{ textAlign: 'left', padding: '16px 24px', fontSize: '12px', fontWeight: '500', color: '#6b7280', borderBottom: '1px solid #f3f4f6' }}>AMOUNT</th>
               <th style={{ textAlign: 'left', padding: '16px 24px', fontSize: '12px', fontWeight: '500', color: '#6b7280', borderBottom: '1px solid #f3f4f6' }}>STAGE</th>
               <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>CLOSE DATE</th>
@@ -152,26 +167,17 @@ const DealsManagement = ({ deals, setDeals, contacts, users }) => {
               <tr key={deal.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
                 <td style={{ padding: '16px 24px', color: '#1f2937', fontSize: '14px', fontWeight: '600' }}>{deal.title}</td>
                 <td style={{ padding: '16px 24px', borderBottom: '1px solid #f3f4f6', color: '#4b5563' }}>{deal.contact}</td>
-                <td style={{ padding: '16px 24px', borderBottom: '1px solid #f3f4f6', color: '#4b5563' }}>{deal.assignedTo || <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>Unassigned</span>}</td>
+
                 <td style={{ padding: '16px 24px', borderBottom: '1px solid #f3f4f6', color: '#4b5563', fontWeight: '500' }}>{currency.symbol}{deal.value}</td>
                 <td style={{ padding: '16px 24px' }}>
-                  <span style={{ 
+                  <span style={{
                     ...getStageStyle(deal.stage),
-                    padding: '4px 12px', 
-                    borderRadius: '9999px', 
-                    fontSize: '12px', 
-                    fontWeight: '500' 
+                    padding: '4px 12px',
+                    borderRadius: '9999px',
+                    fontSize: '12px',
+                    fontWeight: '500'
                   }}>
                     {deal.stage}
-                  </span>
-                </td>
-                <td style={{ padding: '16px 24px' }}>
-                  <span style={{
-                    backgroundColor: getDealStatus(deal.stage) === 'Won' ? '#dcfce7' : getDealStatus(deal.stage) === 'Lost' ? '#fee2e2' : '#f3f4f6',
-                    color: getDealStatus(deal.stage) === 'Won' ? '#166534' : getDealStatus(deal.stage) === 'Lost' ? '#991b1b' : '#374151',
-                    padding: '4px 12px', borderRadius: '9999px', fontSize: '12px', fontWeight: '500'
-                  }}>
-                    {getDealStatus(deal.stage)}
                   </span>
                 </td>
                 <td style={{ padding: '16px 24px', color: '#6b7280', fontSize: '14px' }}>{deal.closeDate}</td>
@@ -195,23 +201,23 @@ const DealsManagement = ({ deals, setDeals, contacts, users }) => {
               </h2>
               <button onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#6b7280' }}>&times;</button>
             </div>
-            
+
             <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>Title</label>
-                <input 
-                  type="text" 
-                  value={currentDeal.title} 
-                  onChange={(e) => setCurrentDeal({...currentDeal, title: e.target.value})}
+                <input
+                  type="text"
+                  value={currentDeal.title}
+                  onChange={(e) => setCurrentDeal({ ...currentDeal, title: e.target.value })}
                   placeholder="Deal Title"
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}
                 />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>Contact</label>
-                <select 
-                  value={currentDeal.contact} 
-                  onChange={(e) => setCurrentDeal({...currentDeal, contact: e.target.value})}
+                <select
+                  value={currentDeal.contact}
+                  onChange={(e) => setCurrentDeal({ ...currentDeal, contact: e.target.value })}
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', backgroundColor: 'white', boxSizing: 'border-box' }}
                 >
                   <option value="">-- Select Contact --</option>
@@ -220,34 +226,22 @@ const DealsManagement = ({ deals, setDeals, contacts, users }) => {
                   ))}
                 </select>
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>Assigned To</label>
-                <select 
-                  value={currentDeal.assignedTo} 
-                  onChange={(e) => setCurrentDeal({...currentDeal, assignedTo: e.target.value})}
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', backgroundColor: 'white', boxSizing: 'border-box' }}
-                >
-                  <option value="">-- Select User --</option>
-                  {users && users.map(u => (
-                    <option key={u.id} value={u.name}>{u.name}</option>
-                  ))}
-                </select>
-              </div>
+
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>Value ({currency.symbol})</label>
-                <input 
-                  type="text" 
-                  value={currentDeal.value} 
-                  onChange={(e) => setCurrentDeal({...currentDeal, value: e.target.value})}
+                <input
+                  type="text"
+                  value={currentDeal.value}
+                  onChange={(e) => setCurrentDeal({ ...currentDeal, value: e.target.value })}
                   placeholder="e.g. 100000"
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}
                 />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>Stage</label>
-                <select 
-                  value={currentDeal.stage} 
-                  onChange={(e) => setCurrentDeal({...currentDeal, stage: e.target.value})}
+                <select
+                  value={currentDeal.stage}
+                  onChange={(e) => setCurrentDeal({ ...currentDeal, stage: e.target.value })}
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', backgroundColor: 'white', boxSizing: 'border-box' }}
                 >
                   {pipelineStages.map(stage => (
@@ -257,23 +251,23 @@ const DealsManagement = ({ deals, setDeals, contacts, users }) => {
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>Expected Close Date</label>
-                <input 
-                  type="date" 
-                  value={currentDeal.closeDate} 
-                  onChange={(e) => setCurrentDeal({...currentDeal, closeDate: e.target.value})}
+                <input
+                  type="date"
+                  value={currentDeal.closeDate}
+                  onChange={(e) => setCurrentDeal({ ...currentDeal, closeDate: e.target.value })}
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}
                 />
               </div>
             </div>
 
             <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'flex-end', gap: '12px', borderBottomLeftRadius: '8px', borderBottomRightRadius: '8px' }}>
-              <button 
+              <button
                 onClick={() => setIsModalOpen(false)}
                 style={{ padding: '8px 16px', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', color: '#374151' }}
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={handleSaveDeal}
                 style={{ padding: '8px 16px', backgroundColor: '#3b82f6', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', color: 'white' }}
               >
@@ -297,13 +291,13 @@ const DealsManagement = ({ deals, setDeals, contacts, users }) => {
               </p>
             </div>
             <div style={{ padding: '16px 24px 24px', display: 'flex', justifyContent: 'center', gap: '12px' }}>
-              <button 
+              <button
                 onClick={() => setIsDeleteModalOpen(false)}
                 style={{ padding: '8px 24px', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', color: '#374151' }}
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={confirmDelete}
                 style={{ padding: '8px 24px', backgroundColor: '#ef4444', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', color: 'white' }}
               >

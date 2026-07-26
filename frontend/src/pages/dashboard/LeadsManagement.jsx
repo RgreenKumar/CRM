@@ -3,6 +3,8 @@ import { useState } from 'react';
 const LeadsManagement = ({ leads, setLeads, users }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState('All');
+  const [filterAssignee, setFilterAssignee] = useState('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add');
@@ -11,14 +13,19 @@ const LeadsManagement = ({ leads, setLeads, users }) => {
 
   const filteredLeads = leads.filter(lead => {
     const query = searchQuery.toLowerCase();
-    return (
+    const matchesSearch = (
       lead.name.toLowerCase().includes(query) ||
       lead.email.toLowerCase().includes(query) ||
       lead.phone.toLowerCase().includes(query) ||
       lead.source.toLowerCase().includes(query) ||
       lead.status.toLowerCase().includes(query) ||
-      lead.assignedTo.toLowerCase().includes(query)
+      (lead.assignedTo || '').toLowerCase().includes(query)
     );
+    const matchesStatus = filterStatus === 'All' || lead.status === filterStatus;
+    const matchesAssignee = filterAssignee === 'All' || 
+      (filterAssignee === 'Unassigned' ? !lead.assignedTo || lead.assignedTo === 'Unassigned' : lead.assignedTo === filterAssignee);
+    
+    return matchesSearch && matchesStatus && matchesAssignee;
   });
 
   const getStatusStyle = (status) => {
@@ -100,6 +107,29 @@ const LeadsManagement = ({ leads, setLeads, users }) => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid #f3f4f6' }}>
           <h3 style={{ margin: 0, fontSize: '16px', color: '#1f2937', fontWeight: '600' }}>All Leads</h3>
           <div style={{ display: 'flex', gap: '16px' }}>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              style={{ padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: '6px', backgroundColor: '#f9fafb', fontSize: '14px', outline: 'none' }}
+            >
+              <option value="All">All Statuses</option>
+              <option value="New">New</option>
+              <option value="Contacted">Contacted</option>
+              <option value="Interested">Interested</option>
+              <option value="Qualified">Qualified</option>
+              <option value="Not Interested">Not Interested</option>
+            </select>
+            <select
+              value={filterAssignee}
+              onChange={(e) => setFilterAssignee(e.target.value)}
+              style={{ padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: '6px', backgroundColor: '#f9fafb', fontSize: '14px', outline: 'none' }}
+            >
+              <option value="All">All Assignees</option>
+              <option value="Unassigned">Unassigned</option>
+              {users && users.filter(u => u.role !== 'Admin' && u.role !== 'ROLE_ADMIN').map(u => (
+                <option key={u.id} value={u.name}>{u.name}</option>
+              ))}
+            </select>
             <input 
               type="text" 
               placeholder="Search..." 
@@ -233,7 +263,7 @@ const LeadsManagement = ({ leads, setLeads, users }) => {
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', backgroundColor: 'white', boxSizing: 'border-box' }}
                 >
                   <option value="">-- Select User --</option>
-                  {users && users.map(u => (
+                  {users && users.filter(u => u.role !== 'Admin' && u.role !== 'ROLE_ADMIN').map(u => (
                     <option key={u.id} value={u.name}>{u.name}</option>
                   ))}
                 </select>

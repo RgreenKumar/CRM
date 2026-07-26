@@ -100,8 +100,8 @@ const ManagerReports = () => {
           );
           const teamMemberNames = salesUsers.map(u => u.name);
 
-          const managerLeads = leads.filter(l => teamMemberNames.includes(l.assignedTo));
-          const managerDeals = deals.filter(d => teamMemberNames.includes(d.assignedTo));
+          const managerLeads = leads.filter(l => teamMemberNames.includes(l.assignedTo) || l.assignedTo === managerName);
+          const managerDeals = deals.filter(d => teamMemberNames.includes(d.assignedTo) || d.assignedTo === managerName);
 
           const totalLeads = managerLeads.length;
           const totalDeals = managerDeals.length;

@@ -26,6 +26,8 @@ public class DataSeeder implements CommandLineRunner {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private SystemSettingRepository systemSettingRepository;
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
@@ -58,8 +60,12 @@ public class DataSeeder implements CommandLineRunner {
         // Check and seed users (only seed essential admin accounts so we don't resurrect deleted test users)
         String encodedPassword = passwordEncoder.encode("password123");
         String[][] userData = {
-            {"Admin User", "admin@example.com", "ROLE_ADMIN"},
-            {"Vishnudharan H", "vishnudharanh@gmail.com", "ROLE_ADMIN"}
+            {"Vishnudharan H", "vishnudharanh@gmail.com", "ROLE_ADMIN", "Active"},
+            {"John Doe", "john.doe@example.com", "ROLE_ADMIN", "Active"},
+            {"Sarah Smith", "sarah.smith@example.com", "ROLE_MANAGER", "Active"},
+            {"Mike Johnson", "mike.johnson@example.com", "ROLE_SALES", "Active"},
+            {"Emily Davis", "emily.davis@example.com", "ROLE_SALES", "Inactive"},
+            {"David Brown", "david.brown@example.com", "ROLE_SALES", "Active"}
         };
 
         for (String[] ud : userData) {
@@ -69,16 +75,20 @@ public class DataSeeder implements CommandLineRunner {
                 u.setName(ud[0]);
                 u.setEmail(ud[1]);
                 u.setRole(ud[2]);
+                u.setStatus(ud[3]);
                 if ("vishnudharanh@gmail.com".equals(ud[1])) {
                     u.setPassword(passwordEncoder.encode("Vishnu@2007"));
                 } else {
                     u.setPassword(encodedPassword);
                 }
                 userRepository.save(u);
-            } else if ("vishnudharanh@gmail.com".equals(ud[1])) {
-                // Update password for the existing user just in case it was created with password123
-                u.setPassword(passwordEncoder.encode("Vishnu@2007"));
-                u.setRole("ROLE_ADMIN");
+            } else {
+                // Update properties in case they changed
+                if ("vishnudharanh@gmail.com".equals(ud[1])) {
+                    u.setPassword(passwordEncoder.encode("Vishnu@2007"));
+                }
+                u.setRole(ud[2]);
+                u.setStatus(ud[3]);
                 userRepository.save(u);
             }
         }
@@ -97,6 +107,26 @@ public class DataSeeder implements CommandLineRunner {
             Lead l5 = new Lead(); l5.setName("Tom Wright"); l5.setEmail("tom@solutions.net"); l5.setPhone("7766554433"); l5.setSource("Website"); l5.setStatus("Not Interested"); l5.setAssignedTo("Sarah Smith"); leadRepository.save(l5);
         }
 
+        if (contactRepository.count() == 0) {
+            Contact c1 = new Contact(); c1.setName("Rahul Kumar"); c1.setEmail("rahul@tech.com"); c1.setPhone("9876543210"); c1.setCompany("Tech Solutions Pvt Ltd"); c1.setDesignation("CTO"); contactRepository.save(c1);
+            Contact c2 = new Contact(); c2.setName("Sophia Lee"); c2.setEmail("sophia@startup.io"); c2.setPhone("9123456789"); c2.setCompany("StartupIO"); c2.setDesignation("CEO"); contactRepository.save(c2);
+            Contact c3 = new Contact(); c3.setName("Nisha Reddy"); c3.setEmail("nisha@enterprise.in"); c3.setPhone("8877665544"); c3.setCompany("Enterprise India"); c3.setDesignation("Procurement Head"); contactRepository.save(c3);
+        }
+
+        if (systemSettingRepository.findById("companyName").isEmpty()) {
+            systemSettingRepository.save(new SystemSetting("companyName", "Your Company"));
+        }
+        if (systemSettingRepository.findById("timeZone").isEmpty()) {
+            systemSettingRepository.save(new SystemSetting("timeZone", "UTC+5:30 (India)"));
+        }
+        if (systemSettingRepository.findById("dateFormat").isEmpty()) {
+            systemSettingRepository.save(new SystemSetting("dateFormat", "MM/DD/YYYY"));
+        }
+        if (systemSettingRepository.findById("currency").isEmpty()) {
+            systemSettingRepository.save(new SystemSetting("currency", "{\"label\":\"INR - Indian Rupee\",\"symbol\":\"₹\"}"));
+        }
+
+        /*
         if (leadRepository.count() < 15) {
             // New leads for Indian Companies
             Lead l6 = new Lead(); l6.setName("Mukesh Ambani"); l6.setEmail("mukesh@ril.com"); l6.setPhone("9876500001"); l6.setSource("Referral"); l6.setStatus("New"); l6.setAssignedTo("Ravichandran"); leadRepository.save(l6);
@@ -123,6 +153,7 @@ public class DataSeeder implements CommandLineRunner {
             Contact c12 = new Contact(); c12.setName("Sanjiv Bajaj"); c12.setEmail("rajeev@bajaj.com"); c12.setPhone("9876500009"); c12.setCompany("Bajaj Finance"); c12.setDesignation("MD"); contactRepository.save(c12);
             Contact c13 = new Contact(); c13.setName("Siddhartha Mohanty"); c13.setEmail("sid@lic.in"); c13.setPhone("9876500010"); c13.setCompany("Life Insurance Corp (LIC)"); c13.setDesignation("Chairman"); contactRepository.save(c13);
         }
+        */
 
         if (dealRepository.count() < 10) {
             if (dealRepository.count() == 0) {
@@ -131,6 +162,7 @@ public class DataSeeder implements CommandLineRunner {
                 Deal d3 = new Deal(); d3.setTitle("Enterprise India Contract"); d3.setContact("Nisha Reddy"); d3.setValue("2,20,000"); d3.setStage("Proposal"); d3.setStatus("Open"); d3.setCloseDate("2026-08-01"); dealRepository.save(d3);
             }
             
+            /*
             // Add extra deals
             Deal d4 = new Deal(); d4.setTitle("Website Revamp"); d4.setContact("Mark Evans"); d4.setValue("45,000"); d4.setStage("Won"); d4.setStatus("Won"); d4.setCloseDate("2026-06-10"); dealRepository.save(d4);
             Deal d5 = new Deal(); d5.setTitle("Cloud Migration"); d5.setContact("Tom Wright"); d5.setValue("1,10,000"); d5.setStage("Prospecting"); d5.setStatus("Open"); d5.setCloseDate("2026-09-20"); dealRepository.save(d5);
@@ -139,8 +171,10 @@ public class DataSeeder implements CommandLineRunner {
             Deal d8 = new Deal(); d8.setTitle("CRM Implementation"); d8.setContact("Nisha Reddy"); d8.setValue("1,80,000"); d8.setStage("Qualification"); d8.setStatus("Open"); d8.setCloseDate("2026-10-10"); dealRepository.save(d8);
             Deal d9 = new Deal(); d9.setTitle("Data Analytics Dashboard"); d9.setContact("Mark Evans"); d9.setValue("95,000"); d9.setStage("Negotiation"); d9.setStatus("Open"); d9.setCloseDate("2026-08-15"); dealRepository.save(d9);
             Deal d10 = new Deal(); d10.setTitle("Security Audit"); d10.setContact("Tom Wright"); d10.setValue("60,000"); d10.setStage("Won"); d10.setStatus("Won"); d10.setCloseDate("2026-07-20"); dealRepository.save(d10);
+            */
         }
 
+        /*
         if (dealRepository.count() < 20) {
             Deal d11 = new Deal(); d11.setTitle("RIL Jio Infrastructure"); d11.setContact("Mukesh Ambani"); d11.setValue("5,00,000"); d11.setStage("Proposal"); d11.setStatus("Open"); d11.setCloseDate("2026-09-01"); dealRepository.save(d11);
             Deal d12 = new Deal(); d12.setTitle("HDFC Loan Software"); d12.setContact("Sashidhar Jagdishan"); d12.setValue("1,20,000"); d12.setStage("Won"); d12.setStatus("Won"); d12.setCloseDate("2026-06-15"); dealRepository.save(d12);
@@ -153,6 +187,7 @@ public class DataSeeder implements CommandLineRunner {
             Deal d19 = new Deal(); d19.setTitle("Bajaj FinTech Portal"); d19.setContact("Sanjiv Bajaj"); d19.setValue("1,40,000"); d19.setStage("Proposal"); d19.setStatus("Open"); d19.setCloseDate("2026-09-15"); dealRepository.save(d19);
             Deal d20 = new Deal(); d20.setTitle("LIC Policy Management"); d20.setContact("Siddhartha Mohanty"); d20.setValue("2,80,000"); d20.setStage("Won"); d20.setStatus("Won"); d20.setCloseDate("2026-08-10"); dealRepository.save(d20);
         }
+        */
 
         if (taskRepository.count() == 0) {
             Task t1 = new Task(); t1.setTitle("Follow up with Rahul"); t1.setAssignedTo("Mike Johnson"); t1.setDueDate("2026-06-20"); t1.setPriority("High"); t1.setStatus("Pending"); taskRepository.save(t1);

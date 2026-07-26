@@ -70,7 +70,7 @@ const ManagerDeals = () => {
           );
           const teamMemberNames = teamMembersList.map(u => u.name);
 
-          const managerDeals = dealsData.filter(d => !d.assignedTo || d.assignedTo === 'Unassigned' || teamMemberNames.includes(d.assignedTo));
+          const managerDeals = dealsData.filter(d => !d.assignedTo || d.assignedTo === 'Unassigned' || teamMemberNames.includes(d.assignedTo) || d.assignedTo === managerName);
 
           setDeals(managerDeals);
         }

@@ -11,6 +11,7 @@ const AppSettings = () => {
     timeZone, setTimeZone,
     dateFormat, setDateFormat,
     currency, setCurrency,
+    updateSettingInDb,
     emailIntegration, setEmailIntegration,
     apiIntegration, setApiIntegration
   } = useSettings();
@@ -96,10 +97,16 @@ const AppSettings = () => {
 
   const handleCurrencyChange = (e) => {
     const val = e.target.value;
-    if (val === 'USD') setCurrency({ label: 'USD - US Dollar', symbol: '$' });
-    else if (val === 'INR') setCurrency({ label: 'INR - Indian Rupee', symbol: '₹' });
-    else if (val === 'EUR') setCurrency({ label: 'EUR - Euro', symbol: '€' });
-    else if (val === 'GBP') setCurrency({ label: 'GBP - British Pound', symbol: '£' });
+    let newCurrency;
+    if (val === 'USD') newCurrency = { label: 'USD - US Dollar', symbol: '$' };
+    else if (val === 'INR') newCurrency = { label: 'INR - Indian Rupee', symbol: '₹' };
+    else if (val === 'EUR') newCurrency = { label: 'EUR - Euro', symbol: '€' };
+    else if (val === 'GBP') newCurrency = { label: 'GBP - British Pound', symbol: '£' };
+    else if (val === 'AUD') newCurrency = { label: 'AUD - Australian Dollar', symbol: 'A$' };
+    else if (val === 'CAD') newCurrency = { label: 'CAD - Canadian Dollar', symbol: 'C$' };
+    
+    setCurrency(newCurrency);
+    updateSettingInDb('currency', newCurrency);
   };
 
   const modalOverlayStyle = {
@@ -271,6 +278,7 @@ const AppSettings = () => {
                     type="text"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
+                    onBlur={() => updateSettingInDb('companyName', companyName)}
                     placeholder="Enter your company name"
                     style={{ width: '100%', maxWidth: '300px', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', color: '#0f172a', boxSizing: 'border-box', outline: 'none' }}
                   />
@@ -289,7 +297,10 @@ const AppSettings = () => {
                   <div style={{ flex: 1 }}>
                     <select 
                       value={timeZone}
-                      onChange={(e) => setTimeZone(e.target.value)}
+                      onChange={(e) => {
+                        setTimeZone(e.target.value);
+                        updateSettingInDb('timeZone', e.target.value);
+                      }}
                       style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', color: '#0f172a', backgroundColor: 'white', boxSizing: 'border-box', outline: 'none', cursor: 'pointer' }}
                     >
                       <option value="UTC+5:30 (India)">UTC+5:30</option>
@@ -302,7 +313,10 @@ const AppSettings = () => {
                   <div style={{ flex: 1 }}>
                     <select 
                       value={dateFormat}
-                      onChange={(e) => setDateFormat(e.target.value)}
+                      onChange={(e) => {
+                        setDateFormat(e.target.value);
+                        updateSettingInDb('dateFormat', e.target.value);
+                      }}
                       style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', color: '#0f172a', backgroundColor: 'white', boxSizing: 'border-box', outline: 'none', cursor: 'pointer' }}
                     >
                       <option value="MM/DD/YYYY">MM/DD/YYYY</option>

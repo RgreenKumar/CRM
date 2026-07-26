@@ -13,8 +13,9 @@ export const SettingsProvider = ({ children }) => {
   const [timeZone, setTimeZone] = useState('UTC+5:30 (India)');
   const [dateFormat, setDateFormat] = useState('MM/DD/YYYY');
 
-  // Fetch stages from backend on load
+  // Fetch settings from backend on load
   useEffect(() => {
+    // Fetch pipeline stages
     fetch('http://localhost:8080/api/stages')
       .then(res => res.json())
       .then(data => {
@@ -27,7 +28,46 @@ export const SettingsProvider = ({ children }) => {
         setPipelineStagesState(enrichedData);
       })
       .catch(err => console.error("Failed to fetch pipeline stages:", err));
+
+    // Fetch system settings
+    fetch('http://localhost:8080/api/settings/get/companyName')
+      .then(res => res.json())
+      .then(data => setCompanyName(data.settingValue))
+      .catch(err => console.error("Failed to fetch company name:", err));
+
+    fetch('http://localhost:8080/api/settings/get/timeZone')
+      .then(res => res.json())
+      .then(data => setTimeZone(data.settingValue))
+      .catch(err => console.error("Failed to fetch timeZone:", err));
+
+    fetch('http://localhost:8080/api/settings/get/dateFormat')
+      .then(res => res.json())
+      .then(data => setDateFormat(data.settingValue))
+      .catch(err => console.error("Failed to fetch dateFormat:", err));
+
+    fetch('http://localhost:8080/api/settings/get/currency')
+      .then(res => res.json())
+      .then(data => setCurrency(JSON.parse(data.settingValue)))
+      .catch(err => console.error("Failed to fetch currency:", err));
   }, []);
+
+  const updateSettingInDb = async (key, value) => {
+    try {
+      const stringValue = typeof value === 'object' ? JSON.stringify(value) : value;
+      const response = await fetch('http://localhost:8080/api/settings/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ settingKey: key, settingValue: stringValue })
+      });
+      if (response.ok) {
+        console.log(`${key} successfully updated in DB.`);
+      }
+    } catch (err) {
+      console.error(`Failed to update ${key} in DB:`, err);
+    }
+  };
 
   const addPipelineStage = async (stageData) => {
     try {
@@ -97,6 +137,7 @@ export const SettingsProvider = ({ children }) => {
     setTimeZone,
     dateFormat,
     setDateFormat,
+    updateSettingInDb,
     emailIntegration,
     setEmailIntegration,
     apiIntegration,

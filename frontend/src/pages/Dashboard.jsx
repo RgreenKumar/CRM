@@ -20,9 +20,17 @@ const Dashboard = () => {
   const loggedInUser = userStr ? JSON.parse(userStr) : null;
   const displayName = loggedInUser?.name || 'Admin User';
   const displayEmail = loggedInUser?.email || 'admin@example.com';
-  const displayRole = loggedInUser?.role === 'ROLE_USER' ? 'Admin' : (loggedInUser?.role || 'Admin');
-
-  const [users, setUsers] = useState([]);
+  const displayRole = loggedInUser?.role === 'ROLE_ADMIN' ? 'Administrator' :
+                      loggedInUser?.role === 'ROLE_MANAGER' ? 'Manager' :
+                      loggedInUser?.role === 'ROLE_SALES' ? 'Sales Person' :
+                      (loggedInUser?.role || 'Administrator');
+  const [users, setUsers] = useState([
+    { id: 1, name: 'John Doe', email: 'john.doe@example.com', role: 'ROLE_ADMIN', status: 'Active' },
+    { id: 2, name: 'Sarah Smith', email: 'sarah.smith@example.com', role: 'ROLE_MANAGER', status: 'Active' },
+    { id: 3, name: 'Mike Johnson', email: 'mike.johnson@example.com', role: 'ROLE_SALES', status: 'Active' },
+    { id: 4, name: 'Emily Davis', email: 'emily.davis@example.com', role: 'ROLE_SALES', status: 'Inactive' },
+    { id: 5, name: 'David Brown', email: 'david.brown@example.com', role: 'ROLE_SALES', status: 'Active' }
+  ]);
   const [leads, setLeads] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [deals, setDeals] = useState([]);
@@ -84,7 +92,7 @@ const Dashboard = () => {
 
   const currentNavItem = navItems.find(item => location.pathname === item.path) || navItems[0];
 
-  const displayHeaderRole = loggedInUser?.role === 'ROLE_USER' ? 'Administrator' : 'Administrator';
+  const displayHeaderRole = displayRole;
   const avatarLetter = displayName.charAt(0).toUpperCase();
 
   return (

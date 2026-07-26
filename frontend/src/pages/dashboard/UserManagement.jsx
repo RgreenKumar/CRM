@@ -14,7 +14,7 @@ const UserManagement = ({ users, setUsers, leads, setLeads, tasks, setTasks }) =
     if (user) {
       setFormData({ name: user.name, email: user.email, role: formatRole(user.role), status: user.status, manager: user.manager || '' });
     } else {
-      setFormData({ name: '', email: '', role: 'Sales Person', status: 'Active', manager: '' });
+      setFormData({ name: '', email: '', role: 'Sales User', status: 'Active', manager: '' });
     }
   };
 
@@ -26,8 +26,8 @@ const UserManagement = ({ users, setUsers, leads, setLeads, tasks, setTasks }) =
 
     const payload = { ...formData };
     if (payload.role === 'Admin') payload.role = 'ROLE_ADMIN';
-    if (payload.role === 'Manager') payload.role = 'ROLE_MANAGER';
-    if (payload.role === 'Sales Person') payload.role = 'ROLE_SALES';
+    if (payload.role === 'Sales Manager') payload.role = 'ROLE_MANAGER';
+    if (payload.role === 'Sales User') payload.role = 'ROLE_SALES';
 
     if (modalState.type === 'add') {
       try {
@@ -86,12 +86,12 @@ const UserManagement = ({ users, setUsers, leads, setLeads, tasks, setTasks }) =
   });
 
   const formatRole = (roleStr) => {
-    if (!roleStr) return '';
+    if (!roleStr) return 'Sales User';
     const normalized = roleStr.toUpperCase();
     if (normalized.includes('ADMIN')) return 'Admin';
-    if (normalized.includes('MANAGER')) return 'Manager';
-    if (normalized.includes('SALES')) return 'Sales Person';
-    return 'Sales Person';
+    if (normalized.includes('MANAGER')) return 'Sales Manager';
+    if (normalized.includes('SALES')) return 'Sales User';
+    return 'Sales User';
   };
 
   const getInitials = (name) => {
@@ -107,70 +107,71 @@ const UserManagement = ({ users, setUsers, leads, setLeads, tasks, setTasks }) =
 
   return (
     <div className="um-container">
-      <div className="um-header-card">
-        <div className="um-title-section">
-          <h2>Team Members</h2>
-          <p>Manage access, roles, and collaborate efficiently.</p>
+      <div className="um-header-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', background: 'white', padding: '1.5rem', borderRadius: '8px', borderBottom: 'none' }}>
+        <div className="um-title-section" style={{ border: 'none', padding: 0 }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#111827', margin: 0 }}>Users</h2>
+          <p style={{ color: '#6b7280', margin: '0.25rem 0 0 0', fontSize: '0.875rem' }}>Manage user accounts and access</p>
         </div>
-        <div className="um-actions">
-          <div className="um-search-wrapper">
-            <Search className="um-search-icon" size={18} />
+        <div className="um-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div className="um-search-wrapper" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '0.5rem 1rem', borderRadius: '6px' }}>
             <input
               type="text"
               className="um-search-input"
-              placeholder="Search users..."
+              placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: '0.875rem' }}
             />
           </div>
-          <button className="um-btn-primary" onClick={() => openModal('add')}>
-            <Plus size={18} /> Add User
+          <button className="um-btn-primary" onClick={() => openModal('add')} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#3b82f6', color: 'white', padding: '0.5rem 1rem', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 500, fontSize: '0.875rem' }}>
+            <Plus size={16} /> Add User
           </button>
         </div>
       </div>
 
-      <div className="um-table-container">
-        <table className="um-table">
-          <thead>
+      <div className="um-table-container" style={{ background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <table className="um-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
             <tr>
-              <th>User</th>
-              <th>Role</th>
-              <th>Manager</th>
-              <th>Status</th>
-              <th style={{ textAlign: 'right' }}>Actions</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: '#64748b', fontSize: '0.875rem' }}>Name</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: '#64748b', fontSize: '0.875rem' }}>Email</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: '#64748b', fontSize: '0.875rem' }}>Role</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: '#64748b', fontSize: '0.875rem' }}>Status</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: '#64748b', fontSize: '0.875rem' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredUsers.map(user => (
-              <tr key={user.id}>
-                <td>
-                  <div className="um-user-cell">
-                    <div className="um-avatar">{getInitials(user.name)}</div>
-                    <div className="um-user-info">
-                      <h4>{user.name}</h4>
-                      <p>{user.email}</p>
-                    </div>
-                  </div>
+              <tr key={user.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                <td style={{ padding: '1rem 1.5rem', fontWeight: 500, color: '#111827', fontSize: '0.875rem' }}>
+                  {user.name}
                 </td>
-                <td>{getRoleBadge(formatRole(user.role))}</td>
-                <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: user.manager ? '#475569' : '#cbd5e1' }}>
-                    {user.manager ? <UserCircle size={16} /> : null}
-                    <span style={{ fontWeight: '500' }}>{user.manager || '—'}</span>
-                  </div>
+                <td style={{ padding: '1rem 1.5rem', color: '#64748b', fontSize: '0.875rem' }}>
+                  {user.email}
                 </td>
-                <td>
-                  <span className={`um-status ${user.status === 'Active' ? 'um-status-active' : 'um-status-inactive'}`}>
+                <td style={{ padding: '1rem 1.5rem', color: '#475569', fontSize: '0.875rem' }}>
+                  {formatRole(user.role)}
+                </td>
+                <td style={{ padding: '1rem 1.5rem' }}>
+                  <span style={{ 
+                    display: 'inline-block',
+                    padding: '0.25rem 0.75rem', 
+                    borderRadius: '9999px', 
+                    fontSize: '0.75rem', 
+                    fontWeight: 500,
+                    background: user.status === 'Active' ? '#22c55e' : '#94a3b8',
+                    color: 'white'
+                  }}>
                     {user.status}
                   </span>
                 </td>
-                <td>
-                  <div className="um-actions-cell">
-                    <button className="um-action-btn" title="Edit User" onClick={() => openModal('edit', user)}>
-                      <Edit2 size={18} />
+                <td style={{ padding: '1rem 1.5rem' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button onClick={() => openModal('edit', user)} style={{ padding: '0.35rem 0.75rem', background: 'white', border: '1px solid #cbd5e1', borderRadius: '4px', color: '#475569', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 500 }}>
+                      Edit
                     </button>
-                    <button className="um-action-btn delete" title="Delete User" onClick={() => openModal('delete', user)}>
-                      <Trash2 size={18} />
+                    <button onClick={() => openModal('delete', user)} style={{ padding: '0.35rem 0.75rem', background: '#ef4444', border: 'none', borderRadius: '4px', color: 'white', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 500 }}>
+                      Delete
                     </button>
                   </div>
                 </td>
@@ -207,12 +208,12 @@ const UserManagement = ({ users, setUsers, leads, setLeads, tasks, setTasks }) =
             <div className="um-form-group">
               <label className="um-form-label">Role</label>
               <select className="um-form-select" value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })}>
-                <option value="Admin">Administrator</option>
-                <option value="Manager">Manager</option>
-                <option value="Sales Person">Sales Representative</option>
+                <option value="Admin">Admin</option>
+                <option value="Sales Manager">Sales Manager</option>
+                <option value="Sales User">Sales User</option>
               </select>
             </div>
-            {formData.role === 'Sales Person' && (
+            {formData.role === 'Sales User' && (
               <div className="um-form-group">
                 <label className="um-form-label">Assign Manager</label>
                 <select className="um-form-select" value={formData.manager} onChange={e => setFormData({ ...formData, manager: e.target.value })}>

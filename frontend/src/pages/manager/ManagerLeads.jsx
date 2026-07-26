@@ -122,7 +122,7 @@ const ManagerLeads = () => {
         setTeamMembers(salesUsers);
         
         const teamMemberNames = salesUsers.map(u => u.name);
-        const managerLeads = leadsData.filter(l => !l.assignedTo || l.assignedTo === 'Unassigned' || teamMemberNames.includes(l.assignedTo));
+        const managerLeads = leadsData.filter(l => !l.assignedTo || l.assignedTo === 'Unassigned' || teamMemberNames.includes(l.assignedTo) || l.assignedTo === managerName);
 
         setLeads(managerLeads);
       }

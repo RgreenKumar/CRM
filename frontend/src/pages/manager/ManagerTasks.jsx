@@ -231,7 +231,7 @@ const ManagerTasks = () => {
         
         const teamMemberNames = salesUsers.map(u => u.name);
         // Assuming tasks have 'assignedTo' or 'owner'. In previous code, tasks might have 'assignedTo'.
-        const managerTasks = tasksData.filter(t => !t.assignedTo || teamMemberNames.includes(t.assignedTo));
+        const managerTasks = tasksData.filter(t => !t.assignedTo || teamMemberNames.includes(t.assignedTo) || t.assignedTo === managerName);
 
         setTasks(managerTasks);
       }
