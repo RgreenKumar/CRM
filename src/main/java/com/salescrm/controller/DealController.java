@@ -38,6 +38,7 @@ public class DealController {
             deal.setStage(dealDetails.getStage());
             deal.setStatus(dealDetails.getStatus());
             deal.setCloseDate(dealDetails.getCloseDate());
+            deal.setSalesPerson(dealDetails.getSalesPerson());
             return ResponseEntity.ok(dealRepository.save(deal));
         }
         return ResponseEntity.notFound().build();

@@ -107,7 +107,7 @@ const TaskModal = ({ task, teamMembers, onClose, onSave }) => {
               onChange={handleChange}
             >
               <option value="">-- Select --</option>
-              {teamMembers.map((member) => (
+              {teamMembers.filter(m => m.status === 'Active').map((member) => (
                 <option key={member.id} value={member.name}>{member.name}</option>
               ))}
             </select>
@@ -229,11 +229,8 @@ const ManagerTasks = () => {
         );
         setTeamMembers(salesUsers);
         
-        const teamMemberNames = salesUsers.map(u => u.name);
-        // Assuming tasks have 'assignedTo' or 'owner'. In previous code, tasks might have 'assignedTo'.
-        const managerTasks = tasksData.filter(t => !t.assignedTo || teamMemberNames.includes(t.assignedTo) || t.assignedTo === managerName);
-
-        setTasks(managerTasks);
+        // Connect with Admin DB: show all tasks
+        setTasks(tasksData);
       }
     } catch (err) {
       console.error("Error fetching data", err);
@@ -321,7 +318,6 @@ const ManagerTasks = () => {
             <thead>
               <tr>
                 <th>TITLE</th>
-                <th>ASSIGNED TO</th>
                 <th>PRIORITY</th>
                 <th>STATUS</th>
                 <th style={{ textAlign: 'right' }}>ACTIONS</th>
@@ -331,7 +327,6 @@ const ManagerTasks = () => {
               {tasks.map((task) => (
                 <tr key={task.id}>
                   <td style={{ fontWeight: '600', color: '#111827' }}>{task.title}</td>
-                  <td>{task.assignedTo || <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>Unassigned</span>}</td>
                   <td><PriorityBadge priority={task.priority} /></td>
                   <td><StatusBadge status={task.status} /></td>
                   <td style={{ textAlign: 'right' }}>
@@ -354,7 +349,7 @@ const ManagerTasks = () => {
               ))}
               {tasks.length === 0 && (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
+                  <td colSpan="4" style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
                     No tasks found.
                   </td>
                 </tr>

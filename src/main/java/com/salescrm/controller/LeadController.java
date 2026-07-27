@@ -2,6 +2,8 @@ package com.salescrm.controller;
 
 import com.salescrm.entity.Lead;
 import com.salescrm.repository.LeadRepository;
+import com.salescrm.entity.Deal;
+import com.salescrm.repository.DealRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,9 @@ public class LeadController {
 
     @Autowired
     private LeadRepository leadRepository;
+
+    @Autowired
+    private DealRepository dealRepository;
 
     @GetMapping
     public List<Lead> getAllLeads() {
@@ -38,8 +43,19 @@ public class LeadController {
             lead.setPhone(leadDetails.getPhone());
             lead.setSource(leadDetails.getSource());
             lead.setStatus(leadDetails.getStatus());
-            lead.setAssignedTo(leadDetails.getAssignedTo());
-            return ResponseEntity.ok(leadRepository.save(lead));
+            lead.setAssignedManager(leadDetails.getAssignedManager());
+            lead.setAssignedSalesperson(leadDetails.getAssignedSalesperson());
+            
+            Lead savedLead = leadRepository.save(lead);
+            
+            // Sync deal salesPerson with lead assignedSalesperson
+            List<Deal> deals = dealRepository.findByContact(savedLead.getName());
+            for (Deal deal : deals) {
+                deal.setSalesPerson(savedLead.getAssignedSalesperson());
+                dealRepository.save(deal);
+            }
+            
+            return ResponseEntity.ok(savedLead);
         }
         return ResponseEntity.notFound().build();
     }

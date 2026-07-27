@@ -8,7 +8,7 @@ const LeadsManagement = ({ leads, setLeads, users }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add');
-  const [currentLead, setCurrentLead] = useState({ name: '', email: '', phone: '', source: 'Website', status: 'New', assignedTo: '' });
+  const [currentLead, setCurrentLead] = useState({ name: '', email: '', phone: '', source: 'Website', status: 'New', assignedManager: '', assignedSalesperson: '' });
   const [leadToDelete, setLeadToDelete] = useState(null);
 
   const filteredLeads = leads.filter(lead => {
@@ -19,11 +19,12 @@ const LeadsManagement = ({ leads, setLeads, users }) => {
       lead.phone.toLowerCase().includes(query) ||
       lead.source.toLowerCase().includes(query) ||
       lead.status.toLowerCase().includes(query) ||
-      (lead.assignedTo || '').toLowerCase().includes(query)
+      (lead.assignedManager || '').toLowerCase().includes(query) ||
+      (lead.assignedSalesperson || '').toLowerCase().includes(query)
     );
     const matchesStatus = filterStatus === 'All' || lead.status === filterStatus;
     const matchesAssignee = filterAssignee === 'All' || 
-      (filterAssignee === 'Unassigned' ? !lead.assignedTo || lead.assignedTo === 'Unassigned' : lead.assignedTo === filterAssignee);
+      (filterAssignee === 'Unassigned' ? !lead.assignedManager || lead.assignedManager === 'Unassigned' : lead.assignedManager === filterAssignee || lead.assignedSalesperson === filterAssignee);
     
     return matchesSearch && matchesStatus && matchesAssignee;
   });
@@ -41,7 +42,7 @@ const LeadsManagement = ({ leads, setLeads, users }) => {
 
   const handleAddClick = () => {
     setModalType('add');
-    setCurrentLead({ name: '', email: '', phone: '', source: 'Website', status: 'New', assignedTo: '' });
+    setCurrentLead({ name: '', email: '', phone: '', source: 'Website', status: 'New', assignedManager: '', assignedSalesperson: '' });
     setIsModalOpen(true);
   };
 
@@ -153,7 +154,8 @@ const LeadsManagement = ({ leads, setLeads, users }) => {
               <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>PHONE</th>
               <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>SOURCE</th>
               <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>STATUS</th>
-              <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>ASSIGNED TO</th>
+              <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>MANAGER</th>
+              <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>SALES PERSON</th>
               <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb', textAlign: 'center' }}>ACTIONS</th>
             </tr>
           </thead>
@@ -175,7 +177,10 @@ const LeadsManagement = ({ leads, setLeads, users }) => {
                     {lead.status}
                   </span>
                 </td>
-                <td style={{ padding: '16px 24px', color: '#6b7280', fontSize: '14px' }}>{lead.assignedTo}</td>
+                <td style={{ padding: '16px 24px', color: '#6b7280', fontSize: '14px' }}>{lead.assignedManager || 'Unassigned'}</td>
+                <td style={{ padding: '16px 24px', color: '#6b7280', fontSize: '14px' }}>
+                  {lead.assignedSalesperson ? lead.assignedSalesperson : <span style={{ fontStyle: 'italic', color: '#9ca3af' }}>Unassigned by manager shortly</span>}
+                </td>
                 <td style={{ padding: '16px 24px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
                   <button onClick={() => handleEditClick(lead)} style={{ backgroundColor: 'white', color: '#374151', border: '1px solid #d1d5db', padding: '6px 12px', borderRadius: '4px', fontSize: '13px', cursor: 'pointer', fontWeight: '500' }}>Edit</button>
                   <button onClick={() => handleDeleteClick(lead)} style={{ backgroundColor: '#ef4444', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', fontSize: '13px', cursor: 'pointer', fontWeight: '500' }}>Delete</button>
@@ -256,14 +261,14 @@ const LeadsManagement = ({ leads, setLeads, users }) => {
                 </select>
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>Assign To</label>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>Assign Manager</label>
                 <select 
-                  value={currentLead.assignedTo} 
-                  onChange={(e) => setCurrentLead({...currentLead, assignedTo: e.target.value})}
+                  value={currentLead.assignedManager} 
+                  onChange={(e) => setCurrentLead({...currentLead, assignedManager: e.target.value})}
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', backgroundColor: 'white', boxSizing: 'border-box' }}
                 >
-                  <option value="">-- Select User --</option>
-                  {users && users.filter(u => u.role !== 'Admin' && u.role !== 'ROLE_ADMIN').map(u => (
+                  <option value="">-- Select Manager --</option>
+                  {users && users.filter(u => u.role !== 'Admin' && u.role !== 'ROLE_ADMIN' && u.role !== 'ROLE_SALES').map(u => (
                     <option key={u.id} value={u.name}>{u.name}</option>
                   ))}
                 </select>

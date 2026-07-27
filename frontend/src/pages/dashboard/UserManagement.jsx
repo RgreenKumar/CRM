@@ -47,7 +47,7 @@ const UserManagement = ({ users, setUsers, leads, setLeads, tasks, setTasks }) =
           
           if (oldName !== updatedUser.name) {
              if (leads && setLeads) {
-                 setLeads(leads.map(l => l.assignedTo === oldName ? { ...l, assignedTo: updatedUser.name } : l));
+                 setLeads(leads.map(l => l.assignedManager === oldName ? { ...l, assignedManager: updatedUser.name } : (l.assignedSalesperson === oldName ? { ...l, assignedSalesperson: updatedUser.name } : l)));
              }
              if (tasks && setTasks) {
                  setTasks(tasks.map(t => t.assignedTo === oldName ? { ...t, assignedTo: updatedUser.name } : t));
@@ -67,7 +67,7 @@ const UserManagement = ({ users, setUsers, leads, setLeads, tasks, setTasks }) =
       if (res.ok) {
         setUsers(users.filter(u => u.id !== modalState.user.id));
         if (leads && setLeads) {
-             setLeads(leads.map(l => l.assignedTo === oldName ? { ...l, assignedTo: 'Unassigned' } : l));
+             setLeads(leads.map(l => l.assignedManager === oldName ? { ...l, assignedManager: 'Unassigned' } : (l.assignedSalesperson === oldName ? { ...l, assignedSalesperson: '' } : l)));
         }
         if (tasks && setTasks) {
              setTasks(tasks.map(t => t.assignedTo === oldName ? { ...t, assignedTo: 'Unassigned' } : t));
@@ -100,31 +100,32 @@ const UserManagement = ({ users, setUsers, leads, setLeads, tasks, setTasks }) =
   };
 
   const getRoleBadge = (role) => {
-    if (role === 'Admin') return <span className="um-badge um-badge-admin"><Shield size={14} /> Admin</span>;
-    if (role === 'Manager') return <span className="um-badge um-badge-manager"><Briefcase size={14} /> Manager</span>;
-    return <span className="um-badge um-badge-sales"><UserCircle size={14} /> Sales Person</span>;
+    if (role === 'Admin') return <span className="um-badge um-badge-admin" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#eff6ff', color: '#2563eb', padding: '0.35rem 0.875rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, border: '1px solid #bfdbfe', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}><Shield size={14} /> Admin</span>;
+    if (role === 'Sales Manager' || role === 'Manager') return <span className="um-badge um-badge-manager" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#fffbeb', color: '#d97706', padding: '0.35rem 0.875rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, border: '1px solid #fde68a', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}><Briefcase size={14} /> Manager</span>;
+    return <span className="um-badge um-badge-sales" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#ecfdf5', color: '#059669', padding: '0.35rem 0.875rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, border: '1px solid #a7f3d0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}><UserCircle size={14} /> Sales</span>;
   };
 
   return (
     <div className="um-container">
-      <div className="um-header-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', background: 'white', padding: '1.5rem', borderRadius: '8px', borderBottom: 'none' }}>
+      <div className="um-header-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', background: 'linear-gradient(to right, #ffffff, #f8fafc)', padding: '1.75rem 2rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)' }}>
         <div className="um-title-section" style={{ border: 'none', padding: 0 }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#111827', margin: 0 }}>Users</h2>
-          <p style={{ color: '#6b7280', margin: '0.25rem 0 0 0', fontSize: '0.875rem' }}>Manage user accounts and access</p>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', margin: 0, letterSpacing: '-0.025em' }}>Users</h2>
+          <p style={{ color: '#64748b', margin: '0.35rem 0 0 0', fontSize: '0.95rem', fontWeight: 400 }}>Manage user accounts and access permissions</p>
         </div>
-        <div className="um-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <div className="um-search-wrapper" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '0.5rem 1rem', borderRadius: '6px' }}>
+        <div className="um-actions" style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
+          <div className="um-search-wrapper" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'white', border: '1px solid #cbd5e1', padding: '0.5rem 1.25rem', borderRadius: '9999px', boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.05)', width: '280px' }}>
+            <Search size={16} color="#94a3b8" />
             <input
               type="text"
               className="um-search-input"
-              placeholder="Search..."
+              placeholder="Search users..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: '0.875rem' }}
+              style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: '0.875rem', color: '#1e293b', width: '100%' }}
             />
           </div>
-          <button className="um-btn-primary" onClick={() => openModal('add')} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#3b82f6', color: 'white', padding: '0.5rem 1rem', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 500, fontSize: '0.875rem' }}>
-            <Plus size={16} /> Add User
+          <button className="um-btn-primary" onClick={() => openModal('add')} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', padding: '0.6rem 1.5rem', borderRadius: '9999px', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem', boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.2)' }}>
+            <Plus size={18} /> Add User
           </button>
         </div>
       </div>
@@ -136,6 +137,7 @@ const UserManagement = ({ users, setUsers, leads, setLeads, tasks, setTasks }) =
               <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: '#64748b', fontSize: '0.875rem' }}>Name</th>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: '#64748b', fontSize: '0.875rem' }}>Email</th>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: '#64748b', fontSize: '0.875rem' }}>Role</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: '#64748b', fontSize: '0.875rem' }}>Reports To</th>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: '#64748b', fontSize: '0.875rem' }}>Status</th>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: '#64748b', fontSize: '0.875rem' }}>Actions</th>
             </tr>
@@ -150,7 +152,10 @@ const UserManagement = ({ users, setUsers, leads, setLeads, tasks, setTasks }) =
                   {user.email}
                 </td>
                 <td style={{ padding: '1rem 1.5rem', color: '#475569', fontSize: '0.875rem' }}>
-                  {formatRole(user.role)}
+                  {getRoleBadge(formatRole(user.role))}
+                </td>
+                <td style={{ padding: '1rem 1.5rem', color: '#475569', fontSize: '0.875rem', fontWeight: 500 }}>
+                  {formatRole(user.role) === 'Sales User' ? (user.manager || <span style={{ color: '#94a3b8', fontStyle: 'italic', fontWeight: 'normal' }}>Unassigned</span>) : <span style={{ color: '#cbd5e1' }}>-</span>}
                 </td>
                 <td style={{ padding: '1rem 1.5rem' }}>
                   <span style={{ 
@@ -179,7 +184,7 @@ const UserManagement = ({ users, setUsers, leads, setLeads, tasks, setTasks }) =
             ))}
             {filteredUsers.length === 0 && (
                <tr>
-                 <td colSpan="5" style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8' }}>
+                 <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8' }}>
                    No users found matching "{searchQuery}"
                  </td>
                </tr>

@@ -1,6 +1,7 @@
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Users, Lightbulb, Contact, Handshake, ClipboardList, BarChart2, LogOut } from 'lucide-react';
 import './ManagerDashboard.css';
+import { useSettings } from '../context/SettingsContext';
 
 import ManagerOverview from './manager/ManagerOverview';
 import TeamManagement from './manager/TeamManagement';
@@ -25,15 +26,23 @@ const ManagerLayout = ({ children }) => {
     navigate('/login');
   };
 
+  const { rolePermissions } = useSettings();
+
+  const getPermission = (name) => {
+    if (!rolePermissions) return true; // Default allow if not loaded
+    const perm = rolePermissions.find(p => p.name === name);
+    return perm ? perm.manager : true;
+  };
+
   const navItems = [
     { path: '/manager', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/manager/team', label: 'Team Management', icon: Users },
-    { path: '/manager/leads', label: 'Leads', icon: Lightbulb },
+    getPermission('Manage Users') && { path: '/manager/team', label: 'Team Management', icon: Users },
+    getPermission('View Leads') && { path: '/manager/leads', label: 'Leads', icon: Lightbulb },
     { path: '/manager/contacts', label: 'Contacts', icon: Contact },
-    { path: '/manager/deals', label: 'Deals', icon: Handshake },
-    { path: '/manager/tasks', label: 'Tasks', icon: ClipboardList },
-    { path: '/manager/reports', label: 'Reports', icon: BarChart2 },
-  ];
+    getPermission('View Deals') && { path: '/manager/deals', label: 'Deals', icon: Handshake },
+    getPermission('Task Management') && { path: '/manager/tasks', label: 'Tasks', icon: ClipboardList },
+    getPermission('View Reports') && { path: '/manager/reports', label: 'Reports', icon: BarChart2 },
+  ].filter(Boolean);
 
   const currentNavItem = navItems.find(item => location.pathname === item.path) || navItems[0];
   const avatarLetter = displayName.charAt(0).toUpperCase();
@@ -88,7 +97,12 @@ const ManagerLayout = ({ children }) => {
         </header>
 
         <div className="manager-content-area">
-          {children}
+          {navItems.some(item => location.pathname === item.path || (item.path !== '/manager' && location.pathname.startsWith(item.path))) ? children : (
+            <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
+              <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: '#1e293b' }}>Access Denied</h3>
+              <p>You do not have permission to view this page. Please contact the administrator.</p>
+            </div>
+          )}
         </div>
       </main>
     </div>

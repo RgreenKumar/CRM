@@ -163,9 +163,18 @@ const TeamManagement = () => {
             u.manager === managerName
           );
           
+          // Map sales person dynamically from lead if not set
+          const enrichedDeals = deals.map(d => {
+            const associatedLead = leads.find(l => l.name === d.contact);
+            return {
+              ...d,
+              salesPerson: associatedLead && associatedLead.assignedSalesperson ? associatedLead.assignedSalesperson : (d.salesPerson || 'Unassigned')
+            };
+          });
+
           const enrichedMembers = salesUsers.map(user => {
-            const userLeads = leads.filter(l => l.assignedTo === user.name);
-            const userDeals = deals.filter(d => d.assignedTo === user.name);
+            const userLeads = leads.filter(l => l.assignedSalesperson === user.name || l.assignedManager === user.name);
+            const userDeals = enrichedDeals.filter(d => d.salesPerson === user.name);
             
             const totalLeads = userLeads.length;
             const wonDeals = userDeals.filter(d => d.stage?.toLowerCase() === 'won').length;

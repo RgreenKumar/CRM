@@ -100,8 +100,17 @@ const ManagerReports = () => {
           );
           const teamMemberNames = salesUsers.map(u => u.name);
 
-          const managerLeads = leads.filter(l => teamMemberNames.includes(l.assignedTo) || l.assignedTo === managerName);
-          const managerDeals = deals.filter(d => teamMemberNames.includes(d.assignedTo) || d.assignedTo === managerName);
+          // Map sales person dynamically from lead if not set
+          const enrichedDeals = deals.map(d => {
+            const associatedLead = leads.find(l => l.name === d.contact);
+            return {
+              ...d,
+              salesPerson: associatedLead && associatedLead.assignedSalesperson ? associatedLead.assignedSalesperson : (d.salesPerson || 'Unassigned')
+            };
+          });
+
+          const managerLeads = leads.filter(l => teamMemberNames.includes(l.assignedSalesperson) || teamMemberNames.includes(l.assignedManager) || l.assignedManager === managerName || l.assignedSalesperson === managerName);
+          const managerDeals = enrichedDeals.filter(d => teamMemberNames.includes(d.salesPerson) || d.salesPerson === managerName);
 
           const totalLeads = managerLeads.length;
           const totalDeals = managerDeals.length;
@@ -113,8 +122,8 @@ const ManagerReports = () => {
           }
           
           const performanceData = salesUsers.map(user => {
-            const userLeadsCount = leads.filter(l => l.assignedTo === user.name).length;
-            const userDeals = deals.filter(d => d.assignedTo === user.name);
+            const userLeadsCount = leads.filter(l => l.assignedSalesperson === user.name || l.assignedManager === user.name).length;
+            const userDeals = enrichedDeals.filter(d => d.salesPerson === user.name);
             const userWonDealsCount = userDeals.filter(d => d.stage?.toLowerCase() === 'won').length;
 
             return {

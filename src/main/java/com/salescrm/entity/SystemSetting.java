@@ -13,6 +13,7 @@ public class SystemSetting {
     @Id
     private String settingKey;
 
+    @jakarta.persistence.Column(columnDefinition = "TEXT")
     private String settingValue;
 
     public SystemSetting() {

@@ -156,7 +156,7 @@ const DashboardOverview = ({ users, leads = [], deals = [] }) => {
                     }}>{lead.status}</span>
                   </td>
                   <td>
-                    <div className="lead-assignee">{lead.assignedTo}</div>
+                    <div className="lead-assignee">{lead.assignedManager}</div>
                   </td>
                 </tr>
               ))}

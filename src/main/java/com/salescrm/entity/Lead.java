@@ -14,7 +14,8 @@ public class Lead {
     private String phone;
     private String source;
     private String status;
-    private String assignedTo;
+    private String assignedManager;
+    private String assignedSalesperson;
 
     public Lead() {}
 
@@ -36,6 +37,9 @@ public class Lead {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public String getAssignedTo() { return assignedTo; }
-    public void setAssignedTo(String assignedTo) { this.assignedTo = assignedTo; }
+    public String getAssignedManager() { return assignedManager; }
+    public void setAssignedManager(String assignedManager) { this.assignedManager = assignedManager; }
+
+    public String getAssignedSalesperson() { return assignedSalesperson; }
+    public void setAssignedSalesperson(String assignedSalesperson) { this.assignedSalesperson = assignedSalesperson; }
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useSettings } from '../../context/SettingsContext';
 
 const StatusBadge = ({ status }) => {
   let bgColor = '#f3f4f6';
@@ -39,7 +40,7 @@ const StatusBadge = ({ status }) => {
 };
 
 const AssignLeadModal = ({ lead, teamMembers, onClose, onAssign }) => {
-  const [selectedUser, setSelectedUser] = useState(lead.assignedTo || '');
+  const [selectedUser, setSelectedUser] = useState(lead.assignedSalesperson || '');
 
   const handleAssign = () => {
     onAssign(lead, selectedUser);
@@ -70,7 +71,7 @@ const AssignLeadModal = ({ lead, teamMembers, onClose, onAssign }) => {
               onChange={(e) => setSelectedUser(e.target.value)}
             >
               <option value="" disabled>Select Team Member</option>
-              {teamMembers.map((member) => (
+              {teamMembers.filter(m => m.status === 'Active').map((member) => (
                 <option key={member.id} value={member.name}>{member.name}</option>
               ))}
               <option value="Unassigned">Unassigned</option>
@@ -91,6 +92,14 @@ const ManagerLeads = () => {
   const [leads, setLeads] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
   const [leadToAssign, setLeadToAssign] = useState(null);
+
+  const { rolePermissions } = useSettings();
+  const getPermission = (name) => {
+    if (!rolePermissions) return true;
+    const perm = rolePermissions.find(p => p.name === name);
+    return perm ? perm.manager : true;
+  };
+  const canAssignLeads = getPermission('Assign Leads');
 
   const token = localStorage.getItem('token');
   const headers = {
@@ -122,7 +131,7 @@ const ManagerLeads = () => {
         setTeamMembers(salesUsers);
         
         const teamMemberNames = salesUsers.map(u => u.name);
-        const managerLeads = leadsData.filter(l => !l.assignedTo || l.assignedTo === 'Unassigned' || teamMemberNames.includes(l.assignedTo) || l.assignedTo === managerName);
+        const managerLeads = leadsData.filter(l => l.assignedManager === managerName);
 
         setLeads(managerLeads);
       }
@@ -136,8 +145,8 @@ const ManagerLeads = () => {
   }, []);
 
   const handleAssignSubmit = async (lead, newAssignee) => {
-    const updatedAssignedTo = newAssignee === 'Unassigned' ? '' : newAssignee;
-    const updatedLead = { ...lead, assignedTo: updatedAssignedTo };
+    const updatedAssignedSalesperson = newAssignee === 'Unassigned' ? '' : newAssignee;
+    const updatedLead = { ...lead, assignedSalesperson: updatedAssignedSalesperson };
 
     try {
       const res = await fetch(`/api/leads/${lead.id}`, {
@@ -167,7 +176,7 @@ const ManagerLeads = () => {
                 <th>EMAIL</th>
                 <th>PHONE</th>
                 <th>STATUS</th>
-                <th>ASSIGNED TO</th>
+                <th>SALES PERSON</th>
                 <th>ACTIONS</th>
               </tr>
             </thead>
@@ -178,14 +187,18 @@ const ManagerLeads = () => {
                   <td>{lead.email}</td>
                   <td>{lead.phone}</td>
                   <td><StatusBadge status={lead.status} /></td>
-                  <td>{lead.assignedTo || 'Unassigned'}</td>
+                  <td>{lead.assignedSalesperson || 'Unassigned'}</td>
                   <td>
-                    <button 
-                      className="manager-action-btn"
-                      onClick={() => setLeadToAssign(lead)}
-                    >
-                      {lead.assignedTo && lead.assignedTo !== 'Unassigned' ? 'Reassign' : 'Assign'}
-                    </button>
+                    {canAssignLeads ? (
+                      <button 
+                        className="manager-action-btn"
+                        onClick={() => setLeadToAssign(lead)}
+                      >
+                        {lead.assignedSalesperson && lead.assignedSalesperson !== 'Unassigned' ? 'Reassign' : 'Assign'}
+                      </button>
+                    ) : (
+                      <span style={{ color: '#9ca3af', fontSize: '0.85rem', fontStyle: 'italic' }}>View Only</span>
+                    )}
                   </td>
                 </tr>
               ))}

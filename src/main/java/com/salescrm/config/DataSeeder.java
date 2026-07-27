@@ -30,9 +30,33 @@ public class DataSeeder implements CommandLineRunner {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+
     @Override
     @SuppressWarnings("null")
     public void run(String... args) throws Exception {
+        try {
+            jdbcTemplate.execute("ALTER TABLE system_settings ALTER COLUMN setting_value TYPE TEXT");
+            System.out.println("Altered system_settings table to use TEXT for setting_value");
+        } catch (Exception e) {
+            System.out.println("Could not alter system_settings table (might already be TEXT): " + e.getMessage());
+        }
+
+        try {
+            // Update assigned manager to existing sales users
+            jdbcTemplate.execute("UPDATE users SET manager = 'Sarah Smith' WHERE role = 'ROLE_SALES' AND manager IS NULL");
+            System.out.println("Assigned manager to existing sales users");
+            
+            // Drop assigned_to column from contacts if it exists
+            try {
+                jdbcTemplate.execute("ALTER TABLE contacts DROP COLUMN assigned_to");
+            } catch (Exception e) {}
+            
+        } catch (Exception e) {
+            System.err.println("Failed to update existing data: " + e.getMessage());
+        }
+
         if (stageRepository.count() == 0) {
             List<PipelineStage> initialStages = Arrays.asList(
                     createStage("Prospecting", "#3b82f6", 0),
@@ -89,6 +113,12 @@ public class DataSeeder implements CommandLineRunner {
                 }
                 u.setRole(ud[2]);
                 u.setStatus(ud[3]);
+                
+                // Set manager for sales users if not already set
+                if (ud[2].contains("SALES") && u.getManager() == null) {
+                    u.setManager("Sarah Smith");
+                }
+                
                 userRepository.save(u);
             }
         }
@@ -100,11 +130,11 @@ public class DataSeeder implements CommandLineRunner {
         }
         
         if (leadRepository.count() == 0) {
-            Lead l1 = new Lead(); l1.setName("Rahul Kumar"); l1.setEmail("rahul@tech.com"); l1.setPhone("9876543210"); l1.setSource("Website"); l1.setStatus("New"); l1.setAssignedTo("Mike Johnson"); leadRepository.save(l1);
-            Lead l2 = new Lead(); l2.setName("Sophia Lee"); l2.setEmail("sophia@startup.io"); l2.setPhone("9123456789"); l2.setSource("Referral"); l2.setStatus("Contacted"); l2.setAssignedTo("Mike Johnson"); leadRepository.save(l2);
-            Lead l3 = new Lead(); l3.setName("Mark Evans"); l3.setEmail("mark@bigcorp.com"); l3.setPhone("9988776655"); l3.setSource("Cold Call"); l3.setStatus("Interested"); l3.setAssignedTo("Sarah Smith"); leadRepository.save(l3);
-            Lead l4 = new Lead(); l4.setName("Nisha Reddy"); l4.setEmail("nisha@enterprise.in"); l4.setPhone("8877665544"); l4.setSource("Social Media"); l4.setStatus("Qualified"); l4.setAssignedTo("David Brown"); leadRepository.save(l4);
-            Lead l5 = new Lead(); l5.setName("Tom Wright"); l5.setEmail("tom@solutions.net"); l5.setPhone("7766554433"); l5.setSource("Website"); l5.setStatus("Not Interested"); l5.setAssignedTo("Sarah Smith"); leadRepository.save(l5);
+            Lead l1 = new Lead(); l1.setName("Rahul Kumar"); l1.setEmail("rahul@tech.com"); l1.setPhone("9876543210"); l1.setSource("Website"); l1.setStatus("New"); l1.setAssignedManager("Sarah Smith"); l1.setAssignedSalesperson("Mike Johnson"); leadRepository.save(l1);
+            Lead l2 = new Lead(); l2.setName("Sophia Lee"); l2.setEmail("sophia@startup.io"); l2.setPhone("9123456789"); l2.setSource("Referral"); l2.setStatus("Contacted"); l2.setAssignedManager("Sarah Smith"); l2.setAssignedSalesperson("Mike Johnson"); leadRepository.save(l2);
+            Lead l3 = new Lead(); l3.setName("Mark Evans"); l3.setEmail("mark@bigcorp.com"); l3.setPhone("9988776655"); l3.setSource("Cold Call"); l3.setStatus("Interested"); l3.setAssignedManager("Sarah Smith"); l3.setAssignedSalesperson("Sarah Smith"); leadRepository.save(l3);
+            Lead l4 = new Lead(); l4.setName("Nisha Reddy"); l4.setEmail("nisha@enterprise.in"); l4.setPhone("8877665544"); l4.setSource("Social Media"); l4.setStatus("Qualified"); l4.setAssignedManager("Sarah Smith"); l4.setAssignedSalesperson("David Brown"); leadRepository.save(l4);
+            Lead l5 = new Lead(); l5.setName("Tom Wright"); l5.setEmail("tom@solutions.net"); l5.setPhone("7766554433"); l5.setSource("Website"); l5.setStatus("Not Interested"); l5.setAssignedManager("Sarah Smith"); l5.setAssignedSalesperson("Sarah Smith"); leadRepository.save(l5);
         }
 
         if (contactRepository.count() == 0) {
@@ -211,8 +241,16 @@ public class DataSeeder implements CommandLineRunner {
         
         List<Lead> allLeads = leadRepository.findAll();
         for (Lead l : allLeads) {
-            if (l.getAssignedTo() != null && !l.getAssignedTo().equals("Unassigned") && !validNames.contains(l.getAssignedTo())) {
-                l.setAssignedTo("Unassigned");
+            boolean changed = false;
+            if (l.getAssignedManager() != null && !l.getAssignedManager().equals("Unassigned") && !validNames.contains(l.getAssignedManager())) {
+                l.setAssignedManager("Unassigned");
+                changed = true;
+            }
+            if (l.getAssignedSalesperson() != null && !l.getAssignedSalesperson().equals("Unassigned") && !validNames.contains(l.getAssignedSalesperson())) {
+                l.setAssignedSalesperson("");
+                changed = true;
+            }
+            if (changed) {
                 leadRepository.save(l);
             }
         }

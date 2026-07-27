@@ -42,19 +42,28 @@ const ManagerOverview = () => {
           );
           const teamMemberNames = teamMembersList.map(u => u.name);
 
-          const managerLeads = leads.filter(l => !l.assignedTo || l.assignedTo === 'Unassigned' || teamMemberNames.includes(l.assignedTo) || l.assignedTo === managerName);
-          const managerDeals = deals.filter(d => teamMemberNames.includes(d.assignedTo) || d.assignedTo === managerName);
+          // Map sales person dynamically from lead if not set
+          const enrichedDeals = deals.map(d => {
+            const associatedLead = leads.find(l => l.name === d.contact);
+            return {
+              ...d,
+              salesPerson: associatedLead && associatedLead.assignedSalesperson ? associatedLead.assignedSalesperson : (d.salesPerson || 'Unassigned')
+            };
+          });
+
+          const managerLeads = leads.filter(l => l.assignedManager === managerName);
+          const managerDeals = enrichedDeals.filter(d => teamMemberNames.includes(d.salesPerson) || d.salesPerson === managerName);
 
           const teamMembers = teamMembersList.length;
           const teamLeads = managerLeads.length;
           const dealsWon = managerDeals.filter(d => d.stage?.toLowerCase() === 'won').length;
           const openDeals = managerDeals.length - dealsWon - managerDeals.filter(d => d.stage?.toLowerCase() === 'lost').length;
 
-          // Map the latest 5 leads as recent activity
-          const recentLeads = [...managerLeads].reverse().slice(0, 5);
+          // Map the latest 4 leads as recent activity
+          const recentLeads = [...managerLeads].reverse().slice(0, 4);
           const activities = recentLeads.map(lead => ({
             id: lead.id,
-            text: <>Lead <strong>{lead.name}</strong> assigned to <strong>{lead.assignedTo || 'Unassigned'}</strong></>,
+            text: <>Lead <strong>{lead.name}</strong> assigned to <strong>{lead.assignedSalesperson || 'Unassigned'}</strong></>,
             meta: `${lead.source || 'Direct'} • ${lead.status || 'New'}`
           }));
 

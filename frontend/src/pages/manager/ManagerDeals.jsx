@@ -49,14 +49,16 @@ const ManagerDeals = () => {
       };
       
       try {
-        const [usersRes, dealsRes] = await Promise.all([
+        const [usersRes, dealsRes, leadsRes] = await Promise.all([
           fetch('/api/users', { headers }),
-          fetch('/api/deals', { headers })
+          fetch('/api/deals', { headers }),
+          fetch('/api/leads', { headers })
         ]);
 
-        if (usersRes.ok && dealsRes.ok) {
+        if (usersRes.ok && dealsRes.ok && leadsRes.ok) {
           const users = await usersRes.json();
           const dealsData = await dealsRes.json();
+          const leadsData = await leadsRes.json();
           
           const loggedInUserStr = localStorage.getItem('user');
           const loggedInUserSession = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
@@ -70,7 +72,16 @@ const ManagerDeals = () => {
           );
           const teamMemberNames = teamMembersList.map(u => u.name);
 
-          const managerDeals = dealsData.filter(d => !d.assignedTo || d.assignedTo === 'Unassigned' || teamMemberNames.includes(d.assignedTo) || d.assignedTo === managerName);
+          // Map sales person dynamically from lead if not set
+          const enrichedDeals = dealsData.map(d => {
+            const associatedLead = leadsData.find(l => l.name === d.contact);
+            return {
+              ...d,
+              salesPerson: associatedLead && associatedLead.assignedSalesperson ? associatedLead.assignedSalesperson : (d.salesPerson || 'Unassigned')
+            };
+          });
+
+          const managerDeals = enrichedDeals.filter(d => !d.salesPerson || d.salesPerson === 'Unassigned' || teamMemberNames.includes(d.salesPerson) || d.salesPerson === managerName);
 
           setDeals(managerDeals);
         }
@@ -114,7 +125,7 @@ const ManagerDeals = () => {
                 <th>TITLE</th>
                 <th>VALUE</th>
                 <th>STAGE</th>
-                <th>ASSIGNED TO</th>
+                <th>SALES PERSON</th>
                 <th>EXPECTED CLOSE</th>
               </tr>
             </thead>
@@ -124,7 +135,7 @@ const ManagerDeals = () => {
                   <td style={{ fontWeight: '600', color: '#111827' }}>{deal.title}</td>
                   <td>{deal.value}</td>
                   <td><StatusBadge status={deal.stage} /></td>
-                  <td>{deal.assignedTo || 'Unassigned'}</td>
+                  <td>{deal.salesPerson || 'Unassigned'}</td>
                   <td>{deal.closeDate || '-'}</td>
                 </tr>
               ))}

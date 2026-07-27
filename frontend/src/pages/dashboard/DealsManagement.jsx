@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 
-const DealsManagement = ({ deals, setDeals, contacts, users }) => {
+const DealsManagement = ({ deals, setDeals, contacts, users, leads = [] }) => {
   const { currency, pipelineStages } = useSettings();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStage, setFilterStage] = useState('All');
@@ -158,6 +158,7 @@ const DealsManagement = ({ deals, setDeals, contacts, users }) => {
 
               <th style={{ textAlign: 'left', padding: '16px 24px', fontSize: '12px', fontWeight: '500', color: '#6b7280', borderBottom: '1px solid #f3f4f6' }}>AMOUNT</th>
               <th style={{ textAlign: 'left', padding: '16px 24px', fontSize: '12px', fontWeight: '500', color: '#6b7280', borderBottom: '1px solid #f3f4f6' }}>STAGE</th>
+              <th style={{ textAlign: 'left', padding: '16px 24px', fontSize: '12px', fontWeight: '500', color: '#6b7280', borderBottom: '1px solid #f3f4f6' }}>SALES PERSON</th>
               <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb' }}>CLOSE DATE</th>
               <th style={{ padding: '12px 24px', borderBottom: '1px solid #e5e7eb', textAlign: 'center' }}>ACTIONS</th>
             </tr>
@@ -179,6 +180,12 @@ const DealsManagement = ({ deals, setDeals, contacts, users }) => {
                   }}>
                     {deal.stage}
                   </span>
+                </td>
+                <td style={{ padding: '16px 24px', color: '#4b5563', fontSize: '14px' }}>
+                  {(() => {
+                    const associatedLead = leads.find(l => l.name === deal.contact);
+                    return associatedLead?.assignedSalesperson || deal.salesPerson || 'Unassigned';
+                  })()}
                 </td>
                 <td style={{ padding: '16px 24px', color: '#6b7280', fontSize: '14px' }}>{deal.closeDate}</td>
                 <td style={{ padding: '16px 24px', display: 'flex', gap: '8px', justifyContent: 'center' }}>

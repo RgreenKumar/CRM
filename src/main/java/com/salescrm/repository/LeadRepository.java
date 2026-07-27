@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface LeadRepository extends JpaRepository<Lead, Long> {
     List<Lead> findByEmail(String email);
-    List<Lead> findByAssignedTo(String assignedTo);
+    List<Lead> findByAssignedManager(String assignedManager);
+    List<Lead> findByAssignedSalesperson(String assignedSalesperson);
 }

@@ -12,6 +12,7 @@ export const SettingsProvider = ({ children }) => {
   const [companyName, setCompanyName] = useState('Your Company');
   const [timeZone, setTimeZone] = useState('UTC+5:30 (India)');
   const [dateFormat, setDateFormat] = useState('MM/DD/YYYY');
+  const [rolePermissions, setRolePermissions] = useState(null);
 
   // Fetch settings from backend on load
   useEffect(() => {
@@ -49,6 +50,35 @@ export const SettingsProvider = ({ children }) => {
       .then(res => res.json())
       .then(data => setCurrency(JSON.parse(data.settingValue)))
       .catch(err => console.error("Failed to fetch currency:", err));
+
+    // Fetch role permissions
+    fetch('http://localhost:8080/api/settings/get/role_permissions')
+      .then(res => {
+        if (!res.ok) throw new Error("Not found");
+        return res.json();
+      })
+      .then(data => {
+        try {
+          const parsed = JSON.parse(data.settingValue);
+          if (!parsed.find(p => p.name === 'Task Management')) {
+            parsed.push({ id: 6, name: 'Task Management', manager: true, salesperson: false });
+          }
+          setRolePermissions(parsed);
+        } catch(e) {
+          console.error("Failed to parse role_permissions", e);
+        }
+      })
+      .catch(err => {
+        console.error("Failed to fetch role_permissions, using defaults:", err);
+        setRolePermissions([
+          { id: 1, name: 'View Leads', manager: true, salesperson: true },
+          { id: 2, name: 'Assign Leads', manager: true, salesperson: false },
+          { id: 3, name: 'View Deals', manager: true, salesperson: true },
+          { id: 4, name: 'View Reports', manager: true, salesperson: false },
+          { id: 5, name: 'Manage Users', manager: false, salesperson: false },
+          { id: 6, name: 'Task Management', manager: true, salesperson: false },
+        ]);
+      });
   }, []);
 
   const updateSettingInDb = async (key, value) => {
@@ -141,7 +171,9 @@ export const SettingsProvider = ({ children }) => {
     emailIntegration,
     setEmailIntegration,
     apiIntegration,
-    setApiIntegration
+    setApiIntegration,
+    rolePermissions,
+    setRolePermissions
   };
 
   return (

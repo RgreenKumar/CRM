@@ -81,9 +81,14 @@ public class UserController {
             User saved = userRepository.save(user);
             
             if (oldName != null && !oldName.equals(newName)) {
-                List<Lead> leads = leadRepository.findByAssignedTo(oldName);
-                for (Lead l : leads) {
-                    l.setAssignedTo(newName);
+                List<Lead> leadsByManager = leadRepository.findByAssignedManager(oldName);
+                for (Lead l : leadsByManager) {
+                    l.setAssignedManager(newName);
+                    leadRepository.save(l);
+                }
+                List<Lead> leadsBySales = leadRepository.findByAssignedSalesperson(oldName);
+                for (Lead l : leadsBySales) {
+                    l.setAssignedSalesperson(newName);
                     leadRepository.save(l);
                 }
                 List<Task> tasks = taskRepository.findByAssignedTo(oldName);
@@ -111,9 +116,14 @@ public class UserController {
             userRepository.deleteById(id);
             
             if (oldName != null) {
-                List<Lead> leads = leadRepository.findByAssignedTo(oldName);
-                for (Lead l : leads) {
-                    l.setAssignedTo("Unassigned");
+                List<Lead> leadsByManager = leadRepository.findByAssignedManager(oldName);
+                for (Lead l : leadsByManager) {
+                    l.setAssignedManager("Unassigned");
+                    leadRepository.save(l);
+                }
+                List<Lead> leadsBySales = leadRepository.findByAssignedSalesperson(oldName);
+                for (Lead l : leadsBySales) {
+                    l.setAssignedSalesperson("");
                     leadRepository.save(l);
                 }
                 List<Task> tasks = taskRepository.findByAssignedTo(oldName);

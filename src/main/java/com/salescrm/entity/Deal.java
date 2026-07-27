@@ -16,7 +16,7 @@ public class Deal {
     private String status;
     private String closeDate;
     
-    private String assignedTo;
+    private String salesPerson;
 
     public Deal() {}
 
@@ -41,6 +41,6 @@ public class Deal {
     public String getCloseDate() { return closeDate; }
     public void setCloseDate(String closeDate) { this.closeDate = closeDate; }
 
-    public String getAssignedTo() { return assignedTo; }
-    public void setAssignedTo(String assignedTo) { this.assignedTo = assignedTo; }
+    public String getSalesPerson() { return salesPerson; }
+    public void setSalesPerson(String salesPerson) { this.salesPerson = salesPerson; }
 }

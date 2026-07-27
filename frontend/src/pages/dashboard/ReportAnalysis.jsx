@@ -18,7 +18,7 @@ const ReportAnalysis = ({ users = [], leads, deals }) => {
   // Get all sales users from the system to show in the report
   const salespersons = users.length > 0 
     ? users.filter(u => isSalesRole(u.role)).map(u => u.name).filter(Boolean)
-    : [...new Set(leads.map(lead => lead.assignedTo))].filter(Boolean);
+    : [...new Set(leads.map(lead => lead.assignedSalesperson))].filter(Boolean);
 
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [fromDate, setFromDate] = useState('');
@@ -37,7 +37,7 @@ const ReportAnalysis = ({ users = [], leads, deals }) => {
 
   const getSalespersonForDeal = (deal) => {
     const lead = leads.find(l => l.name === deal.contact);
-    return lead ? lead.assignedTo : 'Unassigned';
+    return lead ? lead.assignedSalesperson : 'Unassigned';
   };
 
   const getDealStatus = (dealStage) => {
@@ -180,7 +180,7 @@ const ReportAnalysis = ({ users = [], leads, deals }) => {
   };
 
   const teamPerformance = salespersons.map(sp => {
-    const totalLeads = leads.filter(l => l.assignedTo === sp).length;
+    const totalLeads = leads.filter(l => l.assignedSalesperson === sp).length;
     const spDeals = deals.filter(d => getSalespersonForDeal(d) === sp);
     const openDeals = spDeals.filter(d => d.status === 'Open').length;
     const dealsWon = spDeals.filter(d => d.status === 'Won').length;
