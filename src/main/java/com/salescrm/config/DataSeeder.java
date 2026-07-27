@@ -111,8 +111,6 @@ public class DataSeeder implements CommandLineRunner {
                 if ("vishnudharanh@gmail.com".equals(ud[1])) {
                     u.setPassword(passwordEncoder.encode("Vishnu@2007"));
                 }
-                u.setRole(ud[2]);
-                u.setStatus(ud[3]);
                 
                 // Set manager for sales users if not already set
                 if (ud[2].contains("SALES") && u.getManager() == null) {

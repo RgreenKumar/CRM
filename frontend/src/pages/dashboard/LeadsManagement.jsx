@@ -179,7 +179,7 @@ const LeadsManagement = ({ leads, setLeads, users }) => {
                 </td>
                 <td style={{ padding: '16px 24px', color: '#6b7280', fontSize: '14px' }}>{lead.assignedManager || 'Unassigned'}</td>
                 <td style={{ padding: '16px 24px', color: '#6b7280', fontSize: '14px' }}>
-                  {lead.assignedSalesperson ? lead.assignedSalesperson : <span style={{ fontStyle: 'italic', color: '#9ca3af' }}>Unassigned by manager shortly</span>}
+                  {lead.assignedSalesperson ? lead.assignedSalesperson : <span style={{ fontStyle: 'italic', color: '#9ca3af' }}>Pending Manager Review</span>}
                 </td>
                 <td style={{ padding: '16px 24px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
                   <button onClick={() => handleEditClick(lead)} style={{ backgroundColor: 'white', color: '#374151', border: '1px solid #d1d5db', padding: '6px 12px', borderRadius: '4px', fontSize: '13px', cursor: 'pointer', fontWeight: '500' }}>Edit</button>
