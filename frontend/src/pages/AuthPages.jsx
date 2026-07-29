@@ -90,6 +90,8 @@ export const LoginPage = () => {
             // [ Navigate / Redirect to Dashboard based on role ]
             if (profileData.role === 'ROLE_MANAGER') {
               navigate('/manager');
+            } else if (profileData.role === 'ROLE_SALES') {
+              navigate('/sales');
             } else {
               navigate('/dashboard');
             }

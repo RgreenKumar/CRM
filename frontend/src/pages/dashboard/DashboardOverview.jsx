@@ -132,7 +132,7 @@ const DashboardOverview = ({ users, leads = [], deals = [] }) => {
                 <th>Name</th>
                 <th>Source</th>
                 <th>Status</th>
-                <th>Assigned To</th>
+                <th>Sales Person</th>
               </tr>
             </thead>
             <tbody>
@@ -156,7 +156,7 @@ const DashboardOverview = ({ users, leads = [], deals = [] }) => {
                     }}>{lead.status}</span>
                   </td>
                   <td>
-                    <div className="lead-assignee">{lead.assignedManager}</div>
+                    <div className="lead-assignee">{lead.assignedSalesperson || 'Unassigned'}</div>
                   </td>
                 </tr>
               ))}

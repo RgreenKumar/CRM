@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const StatCard = ({ title, value }) => (
   <div className="manager-card manager-stat-card">
@@ -182,9 +184,54 @@ const ManagerReports = () => {
     fetchReportData();
   }, []);
 
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+    
+    doc.setFontSize(18);
+    doc.text("Manager Team Performance Report", 14, 22);
+    
+    doc.setFontSize(12);
+    doc.text(`Total Leads: ${stats.totalLeads}`, 14, 32);
+    doc.text(`Total Deals: ${stats.totalDeals}`, 14, 40);
+    doc.text(`Conversion Rate: ${stats.conversionRate}`, 14, 48);
+    
+    const tableColumn = ["Salesperson", "Leads", "Deals", "Won"];
+    const tableRows = [];
+
+    stats.performanceData.forEach(row => {
+      const rowData = [
+        row.salesperson,
+        row.leads,
+        row.deals,
+        row.won
+      ];
+      tableRows.push(rowData);
+    });
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 55,
+      theme: 'striped',
+      headStyles: { fillColor: [59, 130, 246] }
+    });
+    
+    doc.save("team_performance_report.pdf");
+  };
+
   return (
     <div className="manager-page-container">
       
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: '#111827' }}>Overview</h1>
+        <button 
+          onClick={handleDownloadPDF} 
+          className="manager-btn-primary"
+        >
+          Download PDF
+        </button>
+      </div>
+
       {/* Top Stat Cards */}
       <div className="manager-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '1.5rem' }}>
         <StatCard title="TOTAL LEADS" value={stats.totalLeads} />

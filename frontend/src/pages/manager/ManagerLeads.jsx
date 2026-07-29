@@ -194,7 +194,7 @@ const ManagerLeads = () => {
                         className="manager-action-btn"
                         onClick={() => setLeadToAssign(lead)}
                       >
-                        {lead.assignedSalesperson && lead.assignedSalesperson !== 'Unassigned' ? 'Reassign' : 'Assign'}
+                        Assign
                       </button>
                     ) : (
                       <span style={{ color: '#9ca3af', fontSize: '0.85rem', fontStyle: 'italic' }}>View Only</span>

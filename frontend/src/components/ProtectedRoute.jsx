@@ -21,6 +21,8 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
         return <Navigate to="/dashboard" replace />;
       } else if (user.role === 'ROLE_MANAGER') {
         return <Navigate to="/manager" replace />;
+      } else if (user.role === 'ROLE_SALES') {
+        return <Navigate to="/sales" replace />;
       } else {
         // Fallback for unknown roles
         return <Navigate to="/login" replace />;

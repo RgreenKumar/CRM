@@ -12,6 +12,14 @@ import ManagerDeals from './pages/manager/ManagerDeals';
 import ManagerTasks from './pages/manager/ManagerTasks';
 import ManagerReports from './pages/manager/ManagerReports';
 
+import SalesLayout from './pages/SalesLayout';
+import SalesOverview from './pages/sales/SalesOverview';
+import SalesLeads from './pages/sales/SalesLeads';
+import SalesContacts from './pages/sales/SalesContacts';
+import SalesDeals from './pages/sales/SalesDeals';
+import SalesTasks from './pages/sales/SalesTasks';
+import SalesNotes from './pages/sales/SalesNotes';
+
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -65,6 +73,37 @@ function App() {
           <Route path="/manager/reports" element={
             <ProtectedRoute allowedRoles={['ROLE_MANAGER']}>
               <ManagerLayout><ManagerReports /></ManagerLayout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/sales" element={
+            <ProtectedRoute allowedRoles={['ROLE_SALES']}>
+              <SalesLayout><SalesOverview /></SalesLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/sales/leads" element={
+            <ProtectedRoute allowedRoles={['ROLE_SALES']}>
+              <SalesLayout><SalesLeads /></SalesLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/sales/contacts" element={
+            <ProtectedRoute allowedRoles={['ROLE_SALES']}>
+              <SalesLayout><SalesContacts /></SalesLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/sales/deals" element={
+            <ProtectedRoute allowedRoles={['ROLE_SALES']}>
+              <SalesLayout><SalesDeals /></SalesLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/sales/tasks" element={
+            <ProtectedRoute allowedRoles={['ROLE_SALES']}>
+              <SalesLayout><SalesTasks /></SalesLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/sales/notes" element={
+            <ProtectedRoute allowedRoles={['ROLE_SALES']}>
+              <SalesLayout><SalesNotes /></SalesLayout>
             </ProtectedRoute>
           } />
         </Routes>

@@ -320,6 +320,8 @@ const ManagerTasks = () => {
                 <th>TITLE</th>
                 <th>PRIORITY</th>
                 <th>STATUS</th>
+                <th>DUE DATE</th>
+                <th>SALES PERSON</th>
                 <th style={{ textAlign: 'right' }}>ACTIONS</th>
               </tr>
             </thead>
@@ -329,6 +331,8 @@ const ManagerTasks = () => {
                   <td style={{ fontWeight: '600', color: '#111827' }}>{task.title}</td>
                   <td><PriorityBadge priority={task.priority} /></td>
                   <td><StatusBadge status={task.status} /></td>
+                  <td style={{ color: '#4b5563' }}>{task.dueDate || '-'}</td>
+                  <td style={{ color: '#4b5563' }}>{task.assignedTo || 'Unassigned'}</td>
                   <td style={{ textAlign: 'right' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '1rem' }}>
                       <button 
@@ -349,7 +353,7 @@ const ManagerTasks = () => {
               ))}
               {tasks.length === 0 && (
                 <tr>
-                  <td colSpan="4" style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
+                  <td colSpan="6" style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
                     No tasks found.
                   </td>
                 </tr>
