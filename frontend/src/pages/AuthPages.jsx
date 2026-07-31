@@ -93,7 +93,7 @@ export const LoginPage = () => {
             } else if (profileData.role === 'ROLE_SALES') {
               navigate('/sales');
             } else {
-              navigate('/dashboard');
+              navigate('/admin');
             }
             return;
           }
@@ -102,7 +102,7 @@ export const LoginPage = () => {
         }
 
         // [ Navigate / Redirect to Dashboard (fallback) ]
-        navigate('/dashboard');
+        navigate('/admin');
       } else {
         // [ Authentication Failed ]
         setBannerError('Invalid credentials');

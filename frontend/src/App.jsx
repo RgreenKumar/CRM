@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage, SignupPage, VerifyEmailPage, OtpPage, CreatePasswordPage } from './pages/AuthPages';
-import Dashboard from './pages/Dashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import { SettingsProvider } from './context/SettingsContext';
 
 import ManagerLayout from './pages/ManagerLayout';
@@ -34,9 +34,9 @@ function App() {
           <Route path="/otp" element={<OtpPage />} />
           <Route path="/create-password" element={<CreatePasswordPage />} />
           
-          <Route path="/dashboard/*" element={
+          <Route path="/admin/*" element={
             <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
-              <Dashboard />
+              <AdminDashboard />
             </ProtectedRoute>
           } />
           

@@ -2,17 +2,17 @@ import { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Users, ShieldCheck, Lightbulb, Contact, Handshake, ClipboardList, BarChart2, Settings, LogOut } from 'lucide-react';
 
-import DashboardOverview from './dashboard/DashboardOverview';
-import UserManagement from './dashboard/UserManagement';
-import RolesPermissions from './dashboard/RolesPermissions';
-import LeadsManagement from './dashboard/LeadsManagement';
-import ContactManagement from './dashboard/ContactManagement';
-import DealsManagement from './dashboard/DealsManagement';
-import TaskManagement from './dashboard/TaskManagement';
-import ReportAnalysis from './dashboard/ReportAnalysis';
-import AppSettings from './dashboard/AppSettings';
+import DashboardOverview from './admin/DashboardOverview';
+import UserManagement from './admin/UserManagement';
+import RolesPermissions from './admin/RolesPermissions';
+import LeadsManagement from './admin/LeadsManagement';
+import ContactManagement from './admin/ContactManagement';
+import DealsManagement from './admin/DealsManagement';
+import TaskManagement from './admin/TaskManagement';
+import ReportAnalysis from './admin/ReportAnalysis';
+import AppSettings from './admin/AppSettings';
 
-const Dashboard = () => {
+const AdminDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -79,15 +79,15 @@ const Dashboard = () => {
   };
 
   const navItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/dashboard/users', label: 'User Management', icon: Users },
-    { path: '/dashboard/roles', label: 'Roles & Permissions', icon: ShieldCheck },
-    { path: '/dashboard/leads', label: 'Leads Management', icon: Lightbulb },
-    { path: '/dashboard/contacts', label: 'Contact Management', icon: Contact },
-    { path: '/dashboard/deals', label: 'Deals Management', icon: Handshake },
-    { path: '/dashboard/tasks', label: 'Task Management', icon: ClipboardList },
-    { path: '/dashboard/reports', label: 'Reports & Analysis', icon: BarChart2 },
-    { path: '/dashboard/settings', label: 'Settings', icon: Settings },
+    { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/admin/users', label: 'User Management', icon: Users },
+    { path: '/admin/roles', label: 'Roles & Permissions', icon: ShieldCheck },
+    { path: '/admin/leads', label: 'Leads Management', icon: Lightbulb },
+    { path: '/admin/contacts', label: 'Contact Management', icon: Contact },
+    { path: '/admin/deals', label: 'Deals Management', icon: Handshake },
+    { path: '/admin/tasks', label: 'Task Management', icon: ClipboardList },
+    { path: '/admin/reports', label: 'Reports & Analysis', icon: BarChart2 },
+    { path: '/admin/settings', label: 'Settings', icon: Settings },
   ];
 
   const currentNavItem = navItems.find(item => location.pathname === item.path) || navItems[0];
@@ -158,4 +158,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default AdminDashboard;
