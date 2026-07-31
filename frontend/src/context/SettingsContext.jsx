@@ -16,8 +16,7 @@ export const SettingsProvider = ({ children }) => {
 
   // Fetch settings from backend on load
   useEffect(() => {
-    // Fetch pipeline stages
-    fetch('http://localhost:8080/api/stages')
+    fetch('/api/stages')
       .then(res => res.json())
       .then(data => {
         // Enforce defaults based on name for existing data
@@ -31,28 +30,28 @@ export const SettingsProvider = ({ children }) => {
       .catch(err => console.error("Failed to fetch pipeline stages:", err));
 
     // Fetch system settings
-    fetch('http://localhost:8080/api/settings/get/companyName')
+    fetch('/api/settings/get/companyName')
       .then(res => res.json())
       .then(data => setCompanyName(data.settingValue))
       .catch(err => console.error("Failed to fetch company name:", err));
 
-    fetch('http://localhost:8080/api/settings/get/timeZone')
+    fetch('/api/settings/get/timeZone')
       .then(res => res.json())
       .then(data => setTimeZone(data.settingValue))
       .catch(err => console.error("Failed to fetch timeZone:", err));
 
-    fetch('http://localhost:8080/api/settings/get/dateFormat')
+    fetch('/api/settings/get/dateFormat')
       .then(res => res.json())
       .then(data => setDateFormat(data.settingValue))
       .catch(err => console.error("Failed to fetch dateFormat:", err));
 
-    fetch('http://localhost:8080/api/settings/get/currency')
+    fetch('/api/settings/get/currency')
       .then(res => res.json())
       .then(data => setCurrency(JSON.parse(data.settingValue)))
       .catch(err => console.error("Failed to fetch currency:", err));
 
     // Fetch role permissions
-    fetch('http://localhost:8080/api/settings/get/role_permissions')
+    fetch('/api/settings/get/role_permissions')
       .then(res => {
         if (!res.ok) throw new Error("Not found");
         return res.json();
@@ -84,7 +83,7 @@ export const SettingsProvider = ({ children }) => {
   const updateSettingInDb = async (key, value) => {
     try {
       const stringValue = typeof value === 'object' ? JSON.stringify(value) : value;
-      const response = await fetch('http://localhost:8080/api/settings/save', {
+      const response = await fetch('/api/settings/save', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -101,7 +100,7 @@ export const SettingsProvider = ({ children }) => {
 
   const addPipelineStage = async (stageData) => {
     try {
-      const response = await fetch('http://localhost:8080/api/stages', {
+      const response = await fetch('/api/stages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -117,7 +116,7 @@ export const SettingsProvider = ({ children }) => {
 
   const updatePipelineStage = async (id, stageData) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/stages/${id}`, {
+      const response = await fetch(`/api/stages/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -133,7 +132,7 @@ export const SettingsProvider = ({ children }) => {
 
   const deletePipelineStage = async (id) => {
     try {
-      await fetch(`http://localhost:8080/api/stages/${id}`, {
+      await fetch(`/api/stages/${id}`, {
         method: 'DELETE'
       });
       setPipelineStagesState(pipelineStages.filter(s => s.id !== id));

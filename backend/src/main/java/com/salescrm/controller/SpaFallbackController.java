@@ -15,8 +15,8 @@ public class SpaFallbackController {
         "/verify-email", 
         "/otp", 
         "/create-password",
-        "/dashboard",
-        "/dashboard/**"
+        "/admin",
+        "/admin/**"
     })
     public String redirect() {
         return "forward:/index.html";

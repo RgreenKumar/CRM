@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Target, Briefcase, Clock, CheckCircle } from 'lucide-react';
+import { useSettings } from '../../context/SettingsContext';
 
 const SalesOverview = () => {
+  const { rolePermissions } = useSettings();
+
+  const getPermission = (name) => {
+    if (!rolePermissions) return true; // Default allow if not loaded
+    const perm = rolePermissions.find(p => p.name === name);
+    return perm ? perm.salesperson : true;
+  };
+
   const [dashboardData, setDashboardData] = useState({
     myLeads: 0,
     openDeals: 0,
@@ -83,11 +92,11 @@ const SalesOverview = () => {
   }, []);
 
   const stats = [
-    { label: 'MY LEADS', value: dashboardData.myLeads, icon: <Target size={18} color="#ef4444" />, iconBg: '#fee2e2' },
-    { label: 'OPEN DEALS', value: dashboardData.openDeals, icon: <Briefcase size={18} color="#a855f7" />, iconBg: '#f3e8ff' },
-    { label: 'TASKS DUE TODAY', value: dashboardData.openTasks, icon: <Clock size={18} color="#f97316" />, iconBg: '#ffedd5' },
-    { label: 'DEALS WON', value: dashboardData.dealsWon, icon: <CheckCircle size={18} color="#22c55e" />, iconBg: '#dcfce7' },
-  ];
+    getPermission('View Leads') && { label: 'MY LEADS', value: dashboardData.myLeads, icon: <Target size={18} color="#ef4444" />, iconBg: '#fee2e2' },
+    getPermission('View Deals') && { label: 'OPEN DEALS', value: dashboardData.openDeals, icon: <Briefcase size={18} color="#a855f7" />, iconBg: '#f3e8ff' },
+    getPermission('Task Management') && { label: 'TASKS DUE TODAY', value: dashboardData.openTasks, icon: <Clock size={18} color="#f97316" />, iconBg: '#ffedd5' },
+    getPermission('View Deals') && { label: 'DEALS WON', value: dashboardData.dealsWon, icon: <CheckCircle size={18} color="#22c55e" />, iconBg: '#dcfce7' },
+  ].filter(Boolean);
 
   return (
     <div className="sales-overview-container">
@@ -108,10 +117,16 @@ const SalesOverview = () => {
             </div>
           );
         })}
+        {stats.length === 0 && (
+            <div style={{ gridColumn: '1 / -1', padding: '2rem', textAlign: 'center', color: '#64748b' }}>
+                No overview metrics available based on your permissions.
+            </div>
+        )}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '2rem' }}>
         {/* Today's Tasks */}
+        {getPermission('Task Management') && (
         <div className="sales-activity-section" style={{ padding: '1.5rem', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
           <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>Today's Tasks</h3>
           {dashboardData.todayTasks.length > 0 ? (
@@ -133,8 +148,10 @@ const SalesOverview = () => {
             <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>No tasks due today 🎉</p>
           )}
         </div>
+        )}
 
         {/* Recent Leads */}
+        {getPermission('View Leads') && (
         <div className="sales-activity-section" style={{ padding: '1.5rem', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
           <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>Recent Leads</h3>
           <div className="sales-activity-list" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -169,6 +186,7 @@ const SalesOverview = () => {
             )}
           </div>
         </div>
+        )}
       </div>
     </div>
   );
